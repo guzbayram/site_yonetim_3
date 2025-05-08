@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Django
+*.sqlite3
+db.sqlite3
+.env
+*.log
+
+# Mac
+.DS_Store
+
+# Virtualenv
+venv/
+ENV/
+.env/
+
+# VSCode
+.vscode/
+
+# Diğer
+*.bak
+*.swp
+.idea/
+
+# Git
+.gitignore 
