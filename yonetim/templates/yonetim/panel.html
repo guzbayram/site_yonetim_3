@@ -1,0 +1,476 @@
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Panel - {{ site.ad }}</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: #f0f2f5;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* Dikeyde ortala / Center vertically */
+        align-items: center; /* Yatayda ortala / Center horizontally */
+      }
+      .panel-container {
+        max-width: 1300px;
+        margin: 0 auto;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 25px;
+      }
+      .side-bar {
+        background: #ffffff;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+        margin-bottom: 20px;
+      }
+      .site-title {
+        font-weight: 600;
+        color: #333;
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+      }
+      .table thead {
+        background: #6c757d;
+        color: #fff;
+      }
+      .summary-card {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        text-align: center;
+      }
+      .summary-card .value {
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: #28a745;
+      }
+      .summary-card .value.negative {
+        color: #dc3545;
+      }
+      .summary-card .label {
+        font-size: 0.9rem;
+        color: #555;
+      }
+      .form-section {
+        margin-bottom: 25px;
+        padding: 15px;
+        background-color: #fdfdff;
+        border: 1px solid #eee;
+        border-radius: 5px;
+      }
+      .form-section .form-label {
+        font-weight: 500;
+      }
+      .user-info {
+        padding: 15px;
+        background-color: #e9ecef;
+        border-radius: 5px;
+        margin-bottom: 20px;
+      }
+      .nav-pills .nav-link {
+        color: #555;
+      }
+      .nav-pills .nav-link.active {
+        background-color: #6c757d;
+        color: white;
+      }
+      .table-responsive {
+        max-height: 520px;
+        overflow-y: auto;
+      }
+      /* Toast mesajı panelin üstünde ve ortada, 50px aşağıda / Toast message below panel top */
+      #toast-message {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9999;
+        min-width: 300px;
+        max-width: 90vw;
+        pointer-events: none;
+        top: 50px;
+      }
+      .table-responsive.equal-height {
+        min-height: 350px; /* Her iki tabloya da aynı yükseklik / Same height for both tables */
+        max-height: 520px;
+        overflow-y: auto;
+      }
+      .table.equal-cols {
+        table-layout: auto !important; /* Sütunlar içeriğe göre genişler / Columns auto width */
+        width: 100%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container panel-container">
+      {% if messages %}
+      <div id="toast-message">
+        {% for message in messages %}
+        <div
+          class="toast align-items-center text-bg-{{ message.tags }} border-0 show"
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
+          style="opacity: 0.97; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15)"
+        >
+          <div class="d-flex">
+            <div class="toast-body w-100 text-center">{{ message }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <script>
+        // Türkçe: Uyarı mesajını 3 saniye sonra gizle
+        // English: Hide the toast after 3 seconds
+        setTimeout(function () {
+          var toast = document.getElementById("toast-message");
+          if (toast) toast.style.display = "none";
+        }, 3000);
+      </script>
+      {% endif %}
+
+      <div class="row">
+        <div class="col-lg-4 side-bar">
+          <div class="site-title">{{ site.ad }}</div>
+
+          <div class="user-info">
+            Hoş geldiniz,
+
+            <strong>
+              {{ request.user.first_name }} {{ request.user.last_name }}
+            </strong>
+
+            {% if kullanici_blok_adi != "-" %}
+            <br />Blok: {{ kullanici_blok_adi }} <br />Daire No: 
+            {{ kullanici_daire_no }} {% elif request.user.is_yonetici %}
+            <br /><span class="text-muted">
+              (Yönetici - Henüz daire seçilmedi)</span
+            >
+            {% endif %}
+            <hr />
+            Site Aylık Aidat:
+            <strong>{{ site_aylik_aidat|floatformat:2|intcomma }} ₺</strong>
+            <br />
+            Toplam Ödediğiniz Aidat: {{ kullanici_odenmis_aidat_toplami|floatformat:2|intcomma }} ₺
+          </div>
+
+          {% if kullanici_daireler.exists or request.user.is_yonetici %}
+          <div class="form-section">
+            <h5>Aidat İşlemi</h5>
+            <form method="post">
+              {% csrf_token %} {% if request.user.is_yonetici %}
+              <div class="mb-3">
+                <label for="daire_id_form" class="form-label"
+                  >Daire Seçin (Yönetici)</label
+                >
+                <select
+                  name="daire_id_form"
+                  id="daire_id_form"
+                  class="form-select"
+                  required
+                >
+                  <option value="">---------</option>
+                  {% for d in daireler %}
+                  <option value="{{ d.id }}">
+                    {{ d.blok.ad }} - {{ d.no }} {% if d.kullanici%}
+                    ({{d.kullanici.first_name}} {{d.kullanici.last_name}})
+                    {%else %}(Boş){% endif %}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+              {% elif kullanici_daireler.exists %}
+              <input
+                type="hidden"
+                name="daire_id_form"
+                value="{{ kullanici_daireler.first.id }}"
+              />
+              <p>
+                <strong>{{kullanici_blok_adi}} - {{kullanici_daire_no}}</strong>
+                için aidat ödemesi:
+              </p>
+              {% endif %}
+              <div class="mb-3">
+                <label for="odeme_miktari" class="form-label"
+                  >Ödeme Miktarı (₺)</label
+                >
+                <input
+                  type="number"
+                  class="form-control"
+                  name="odeme_miktari"
+                  id="odeme_miktari"
+                  placeholder="Örn: {{ site_aylik_aidat|floatformat:0 }}"
+                  step="0.01"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="odeme_aciklama" class="form-label"
+                  >Açıklama (Opsiyonel)</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  name="odeme_aciklama"
+                  id="odeme_aciklama"
+                  placeholder="Örn: Mayıs Ayı Aidatı"
+                />
+              </div>
+              <button type="submit" class="btn btn-success w-100">
+                AİDAT KAYDET
+              </button>
+            </form>
+          </div>
+          {% endif %} {% if request.user.is_yonetici %}
+          <div class="form-section">
+            <h5>Gider Ekleme</h5>
+            <form method="post">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label for="gider_turu" class="form-label">Gider Türü</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="gider_turu"
+                  id="gider_turu"
+                  placeholder="Örn: Elektrik Faturası"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="gider_miktari" class="form-label"
+                  >Gider Miktarı (₺)</label
+                >
+                <input
+                  type="number"
+                  class="form-control"
+                  name="gider_miktari"
+                  id="gider_miktari"
+                  placeholder="Örn: 150.75"
+                  step="0.01"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="gider_aciklama" class="form-label"
+                  >Açıklama (Opsiyonel)</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  name="gider_aciklama"
+                  id="gider_aciklama"
+                />
+              </div>
+              <button type="submit" class="btn btn-danger w-100">
+                GİDER KAYDET
+              </button>
+            </form>
+          </div>
+          {% endif %}
+
+          <hr />
+          {% if request.user.is_yonetici %}
+          <a
+            href="{% url 'yonetim:site_bilgi' %}"
+            class="btn btn-info w-100 mb-2"
+            >Site Bilgilerini Düzenle</a
+          >
+          {% endif %}
+          <a href="{% url 'yonetim:cikis' %}" class="btn btn-secondary w-100"
+            >Çıkış Yap</a
+          >
+        </div>
+
+        <div class="col-lg-8">
+          <div class="row text-center mb-4">
+            <div class="col-md-4">
+              <div class="summary-card">
+                <div class="value">
+                  {{ toplam_gelir|floatformat:2|intcomma }} ₺
+                </div>
+                <div class="label">Toplam Gelir (Aidatlar)</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="summary-card">
+                <div class="value negative">
+                  {{ toplam_gider|floatformat:2|intcomma }} ₺
+                </div>
+                <div class="label">Toplam Gider</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="summary-card">
+                <div
+                  class="value {% if kasa_bakiyesi < 0 %}negative{% endif %}"
+                >
+                  {{ kasa_bakiyesi|floatformat:2|intcomma }} ₺
+                </div>
+                <div class="label">Kasa Bakiyesi</div>
+              </div>
+            </div>
+          </div>
+
+          <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link active"
+                id="pills-aidatlar-tab"
+                data-bs-toggle="pill"
+                data-bs-target="#pills-aidatlar"
+                type="button"
+                role="tab"
+                aria-controls="pills-aidatlar"
+                aria-selected="true"
+              >
+                Aidat Listesi
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="pills-giderler-tab"
+                data-bs-toggle="pill"
+                data-bs-target="#pills-giderler"
+                type="button"
+                role="tab"
+                aria-controls="pills-giderler"
+                aria-selected="false"
+              >
+                Gider Listesi
+              </button>
+            </li>
+          </ul>
+          <div class="tab-content" id="pills-tabContent">
+            <div
+              class="tab-pane fade show active"
+              id="pills-aidatlar"
+              role="tabpanel"
+              aria-labelledby="pills-aidatlar-tab"
+            >
+              <h5>Aidat Takip Listesi</h5>
+              <div class="table-responsive equal-height">
+                <table
+                  class="table table-bordered table-striped table-hover equal-cols"
+                  style="margin-bottom: 0"
+                >
+                  <thead
+                    style="
+                      position: sticky;
+                      top: 0;
+                      background: #6c757d;
+                      color: #fff;
+                      z-index: 2;
+                    "
+                  >
+                    <tr>
+                      <th>B-D</th>
+                      <th>Sakin</th>
+                      <th>Yıllık Borç</th>
+                      <th>Ödenen</th>
+                      <th>Bakiye</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for d in aidat_ozet %}
+                    <tr>
+                      <td>{{ d.blok }}-{{ d.daire_no }}</td>
+                      <td>{{ d.sakin }}</td>
+                      <td>{{ d.yillik_borc|floatformat:2|intcomma }} ₺</td>
+                      <td>{{ d.odenen|floatformat:2|intcomma }} ₺</td>
+                      <td class="fw-bold {{ d.bakiye_renk }}">
+                        {% if d.bakiye > 0 %}-{{ d.bakiye|floatformat:2|intcomma }} ₺ 
+                        {% elif d.bakiye < 0 %}+{{ d.bakiye|floatformat:2|intcomma|slice:'1:' }} ₺ 
+                        {% else %}0 ₺{% endif %}
+                      </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                      <td colspan="5" class="text-center">
+                        Kayıtlı daire yok.
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div
+              class="tab-pane fade"
+              id="pills-giderler"
+              role="tabpanel"
+              aria-labelledby="pills-giderler-tab"
+            >
+              <h5>Gider Takip Listesi</h5>
+              <div class="table-responsive equal-height">
+                <table
+                  class="table table-bordered table-striped table-hover equal-cols"
+                  style="margin-bottom: 0"
+                >
+                  <thead
+                    style="
+                      position: sticky;
+                      top: 0;
+                      background: #6c757d;
+                      color: #fff;
+                      z-index: 2;
+                    "
+                  >
+                    <tr>
+                      <th>Tarih</th>
+                      <th>Tür</th>
+                      <th>Tutar</th>
+                      <th>Açıklama</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for gider in giderler %}
+                    <tr>
+                      <td>{{ gider.tarih|date:"d M Y" }}</td>
+                      <td>{{ gider.tur }}</td>
+                      <td>{{ gider.tutar|floatformat:2|intcomma }} ₺</td>
+                      <td>{{ gider.aciklama|default:"-" }}</td>
+                    </tr>
+                    {% endfor %} 
+                    
+                    {% for _ in gider_bos_satir_sayisi %}
+                    <tr>
+                      <td>&nbsp;</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    {% endfor %} {% if giderler|length == 0 %}
+                    <tr>
+                      <td colspan="4" class="text-center">
+                        Kayıtlı gider yok.
+                      </td>
+                    </tr>
+                    {% endif %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
