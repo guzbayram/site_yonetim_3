@@ -1,212 +1,447 @@
 <!DOCTYPE html>
 <html lang="tr">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Kayıt Ol</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <style>
-        body { background: #f0f2f5; }
-        .register-container { max-width: 550px; margin: 50px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 30px; }
-        .register-title { font-weight: 600; text-align: center; margin-bottom: 25px; color: #333; }
-        .form-label {font-weight: 500;}
+      body {
+        background: #6a0dad; /* Resimdeki gibi mor bir arka plan */
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: sans-serif; /* Daha modern bir font */
+      }
+      .main-container {
+        display: flex;
+        align-items: center; /* Dikeyde ortala */
+        justify-content: space-around; /* Elemanlar arasında boşluk bırak */
+        width: 100%;
+        max-width: 1200px; /* Maksimum genişlik */
+        padding: 0 20px; /* Kenar boşlukları */
+      }
+      .title-section {
+        flex-basis: 45%; /* Sol tarafın genişliği */
+        padding-right: 50px; /* Form ile arasında boşluk */
+      }
+      .title-section h1 {
+        color: #fff;
+        font-size: 3.5rem; /* Yazı boyutu biraz daha büyük */
+        font-weight: 700;
+        line-height: 1.3;
+        text-align: left;
+      }
+      .register-container {
+        flex-basis: 45%; /* Sağ tarafın (form) genişliği */
+        max-width: 450px; /* Formun maksimum genişliği */
+        background: #fff;
+        border-radius: 12px; /* Daha yuvarlak köşeler */
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Daha belirgin gölge */
+        padding: 40px; /* İç boşluk artırıldı */
+      }
+      .register-title {
+        font-weight: 700; /* Daha kalın başlık */
+        text-align: center;
+        margin-bottom: 30px; /* Alt boşluk artırıldı */
+        color: #333;
+        font-size: 1.8rem; /* Başlık boyutu */
+      }
+      .form-label {
+        font-weight: 600; /* Label'lar biraz daha kalın */
+        color: #555;
+        margin-bottom: 0.3rem;
+      }
+      .form-control {
+        border-radius: 6px; /* Input alanları için yuvarlak köşeler */
+        padding: 0.75rem 1rem; /* Input iç boşluğu */
+        border: 1px solid #ced4da;
+      }
+      .form-control:focus {
+        border-color: #8A2BE2; /* Odaklandığında mor çerçeve */
+        box-shadow: 0 0 0 0.25rem rgba(138, 43, 226, 0.25); /* Odaklandığında mor gölge */
+      }
+      .form-check-label {
+          font-weight: normal;
+      }
+      .btn-primary {
+        background-color: #6a0dad; /* Buton rengi mor */
+        border-color: #6a0dad;
+        padding: 0.75rem; /* Buton iç boşluğu */
+        font-weight: 600;
+        border-radius: 6px; /* Buton köşeleri */
+      }
+      .btn-primary:hover,
+      .btn-primary:focus {
+        background-color: #540a8c; /* Hover rengi koyu mor */
+        border-color: #540a8c;
+      }
+      a {
+        color: #6a0dad; /* Link rengi mor */
+        text-decoration: none; /* Alt çizgiyi kaldır */
+      }
+      a:hover {
+        color: #540a8c; /* Link hover rengi koyu mor */
+        text-decoration: underline; /* Hover'da alt çizgi */
+      }
+      .form-text {
+        font-size: 0.85rem; /* Yardımcı metin boyutu */
+        color: #6c757d;
+      }
+      .alert {
+        border-radius: 6px;
+      }
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .main-container {
+          flex-direction: column; /* Küçük ekranlarda alt alta */
+          text-align: center;
+        }
+        .title-section {
+          padding-right: 0;
+          margin-bottom: 30px; /* Başlık ile form arasına boşluk */
+          text-align: center; /* Başlığı ortala */
+        }
+        .title-section h1 {
+            text-align: center; /* Başlığı ortala */
+            font-size: 2.5rem; /* Küçük ekranlar için başlık boyutu */
+        }
+        .register-container {
+          max-width: 100%; /* Form tam genişlik */
+        }
+      }
     </style>
-</head>
-<body>
-    <div class="register-container">
-        
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            {% endfor %}
-        {% endif %}
+  </head>
+  <body>
+    <div class="main-container">
+      <div class="title-section">
+        <h1>
+          Site ve Apartman<br />Yönetim<br />Uygulaması
+        </h1>
+      </div>
 
-        {% if yonetici_kaydi_icin_daire_secimi %}
-            <h2 class="register-title">Yönetici Daire Seçimi</h2>
-            <p>Merhaba {{ first_name }}, lütfen {{ site_kodu }} kodlu sitenizdeki kendi dairenizi seçin.</p>
-            <form method="post" id="yoneticiDaireSecimForm">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label for="yonetici_daire_id" class="form-label">Daireniz</label>
-                    <select name="yonetici_daire_id" id="yonetici_daire_id" class="form-select" required>
-                        <option value="">---------</option>
-                        {% for blok in site_bloklari %}
-                            <optgroup label="{{ blok.ad }}">
-                                {% for daire in blok.daireler.all %}
-                                    <option value="{{ daire.id }}" {% if daire.kullanici %}disabled{% endif %}>
-                                        Daire No: {{ daire.no }} {% if daire.kullanici %}(Dolu){% endif %}
-                                    </option>
-                                {% endfor %}
-                            </optgroup>
-                        {% empty %}
-                            <option value="" disabled>Bu site için henüz daire tanımlanmamış.</option>
-                        {% endfor %}
-                    </select>
-                    <div class="form-text">Sadece boş olan daireler seçilebilir.</div>
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Dairemi Seç ve Kaydet</button>
-                 <div class="text-center mt-3">
-                    <a href="{% url 'yonetim:panel' %}">Panele Dön</a> | <a href="{% url 'yonetim:cikis' %}">Çıkış Yap</a>
-                </div>
-            </form>
+      <div class="register-container">
+        {% if messages %} {% for message in messages %}
+        <div
+          class="alert alert-{{ message.tags }} alert-dismissible fade show"
+          role="alert"
+        >
+          {{ message }}
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+        {% endfor %} {% endif %} {% if yonetici_kaydi_icin_daire_secimi %}
+        <h2 class="register-title">Yönetici Daire Seçimi</h2>
+        <p>
+          Merhaba {{ first_name }}, lütfen {{ site_kodu }} kodlu sitenizdeki
+          kendi dairenizi seçin.
+        </p>
+        <form method="post" id="yoneticiDaireSecimForm">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="yonetici_daire_id" class="form-label">Daireniz</label>
+            <select
+              name="yonetici_daire_id"
+              id="yonetici_daire_id"
+              class="form-select"
+              required
+            >
+              <option value="">---------</option>
+              {% for blok in site_bloklari %}
+              <optgroup label="{{ blok.ad }}">
+                {% for daire in blok.daireler.all %}
+                <option value="{{ daire.id }}" {% if daire.kullanici %}disabled{% endif %}>
+                  Daire No: {{ daire.no }} {% if daire.kullanici %}(Dolu){% endif %}
+                </option>
+                {% endfor %}
+              </optgroup>
+              {% empty %}
+              <option value="" disabled>
+                Bu site için henüz daire tanımlanmamış.
+              </option>
+              {% endfor %}
+            </select>
+            <div class="form-text">
+              Sadece boş olan daireler seçilebilir.
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">
+            Dairemi Seç ve Kaydet
+          </button>
+          <div class="text-center mt-3">
+            <a href="{% url 'yonetim:panel' %}">Panele Dön</a> |
+            <a href="{% url 'yonetim:cikis' %}">Çıkış Yap</a>
+          </div>
+        </form>
         {% else %}
-            <h2 class="register-title">Yeni Üyelik Kaydı</h2>
-            <form method="post" id="kayitForm">
-                {% csrf_token %}
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="first_name" class="form-label">Ad</label>
-                        <input type="text" name="first_name" id="first_name" class="form-control" required value="{{ request.POST.first_name|default:'' }}" />
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="last_name" class="form-label">Soyad</label>
-                        <input type="text" name="last_name" id="last_name" class="form-control" required value="{{ request.POST.last_name|default:'' }}" />
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Kayıt Türü</label>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rol" id="rol_yonetici" value="yonetici" required {% if request.POST.rol == 'yonetici' %}checked{% endif %}/>
-                        <label class="form-check-label" for="rol_yonetici">Yeni Site Yöneticisiyim (Yeni site kuracağım)</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rol" id="rol_sakin" value="sakin" required {% if request.POST.rol == 'sakin' %}checked{% endif %}/>
-                        <label class="form-check-label" for="rol_sakin">Daire Sakiniyim (Mevcut bir siteye kaydolacağım)</label>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label for="site_kodu" class="form-label">Site Kodu</label>
-                    <input type="text" name="site_kodu" id="site_kodu" class="form-control" placeholder="Yöneticinizden aldığınız veya oluşturacağınız 3 karakterli kod" required maxlength="3" pattern="[a-z0-9]{3}" title="3 karakter, küçük harf ve rakam." value="{{ request.POST.site_kodu|default:'' }}" />
-                    <div class="form-text">Yöneticiyseniz yeni bir kod belirleyin. Sakin iseniz yöneticinizden alın. (Örn: a1b)</div>
-                </div>
-                
-                <div id="sakin_fields" style="display:none;">
-                    <div class="mb-3">
-                        <label for="sakin_blok_id" class="form-label">Blok Adı</label>
-                        <select name="sakin_blok_id" id="sakin_blok_id" class="form-select">
-                            <option value="">Önce Site Kodu Girin</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="sakin_daire_id" class="form-label">Boş Daire No</label>
-                        <select name="sakin_daire_id" id="sakin_daire_id" class="form-select">
-                            <option value="">Önce Blok Seçin</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="password" class="form-label">Parola</label>
-                        <input type="password" name="password" id="password" class="form-control" required />
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="password_confirm" class="form-label">Parola Onayı</label>
-                        <input type="password" name="password_confirm" id="password_confirm" class="form-control" required />
-                    </div>
-                </div>
-                
-                <button type="submit" class="btn btn-primary w-100">KAYIT OL</button>
-            </form>
-            <div class="text-center mt-3">
-                <span>Zaten bir hesabınız var mı? <a href="{% url 'yonetim:giris' %}">Giriş Yap</a></span>
+        <h2 class="register-title">Yeni Üyelik Kaydı</h2>
+        <form method="post" id="kayitForm">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="first_name" class="form-label">Ad</label>
+              <input
+                type="text"
+                name="first_name"
+                id="first_name"
+                class="form-control"
+                required
+                value="{{ request.POST.first_name|default:'' }}"
+              />
             </div>
+            <div class="col-md-6 mb-3">
+              <label for="last_name" class="form-label">Soyad</label>
+              <input
+                type="text"
+                name="last_name"
+                id="last_name"
+                class="form-control"
+                required
+                value="{{ request.POST.last_name|default:'' }}"
+              />
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Kayıt Türü</label>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="rol"
+                id="rol_yonetici"
+                value="yonetici"
+                required
+                {% if request.POST.rol == 'yonetici' %}checked{% endif %}
+              />
+              <label class="form-check-label" for="rol_yonetici">
+                Yeni Site Yöneticisiyim (Yeni site kuracağım)
+              </label>
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="rol"
+                id="rol_sakin"
+                value="sakin"
+                required
+                {% if request.POST.rol == 'sakin' %}checked{% endif %}
+              />
+              <label class="form-check-label" for="rol_sakin">
+                Daire Sakiniyim (Mevcut bir siteye kaydolacağım)
+              </label>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="site_kodu" class="form-label">Site Kodu</label>
+            <input
+              type="text"
+              name="site_kodu"
+              id="site_kodu"
+              class="form-control"
+              placeholder="Yöneticinizden aldığınız veya oluşturacağınız 3 karakterli kod"
+              required
+              maxlength="3"
+              pattern="[a-z0-9]{3}"
+              title="3 karakter, küçük harf ve rakam."
+              value="{{ request.POST.site_kodu|default:'' }}"
+            />
+            <div class="form-text">
+              Yöneticiyseniz yeni bir kod belirleyin. Sakin iseniz
+              yöneticinizden alın. (Örn: a1b)
+            </div>
+          </div>
+
+          <div id="sakin_fields" style="display: none">
+            <div class="mb-3">
+              <label for="sakin_blok_id" class="form-label">Blok Adı</label>
+              <select name="sakin_blok_id" id="sakin_blok_id" class="form-select">
+                <option value="">Önce Site Kodu Girin</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="sakin_daire_id" class="form-label">Boş Daire No</label>
+              <select name="sakin_daire_id" id="sakin_daire_id" class="form-select">
+                <option value="">Önce Blok Seçin</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="password" class="form-label">Parola</label>
+              <input
+                type="password"
+                name="password"
+                id="password"
+                class="form-control"
+                required
+              />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="password_confirm" class="form-label">Parola Onayı</label>
+              <input
+                type="password"
+                name="password_confirm"
+                id="password_confirm"
+                class="form-control"
+                required
+              />
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">
+            KAYIT OL
+          </button>
+        </form>
+        <div class="text-center mt-3">
+          <span>Zaten bir hesabınız var mı?
+            <a href="{% url 'yonetim:giris' %}">Giriş Yap</a></span>
+        </div>
         {% endif %}
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     {% if not yonetici_kaydi_icin_daire_secimi %}
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const rolYonetici = document.getElementById('rol_yonetici');
-            const rolSakin = document.getElementById('rol_sakin');
-            const sakinFields = document.getElementById('sakin_fields');
-            const siteKoduInput = document.getElementById('site_kodu');
-            const sakinBlokSelect = document.getElementById('sakin_blok_id');
-            const sakinDaireSelect = document.getElementById('sakin_daire_id');
+      document.addEventListener("DOMContentLoaded", function () {
+        const rolYonetici = document.getElementById("rol_yonetici");
+        const rolSakin = document.getElementById("rol_sakin");
+        const sakinFields = document.getElementById("sakin_fields");
+        const siteKoduInput = document.getElementById("site_kodu");
+        const sakinBlokSelect = document.getElementById("sakin_blok_id");
+        const sakinDaireSelect = document.getElementById("sakin_daire_id");
 
-            function toggleSakinFields() {
-                if (rolSakin.checked) {
-                    sakinFields.style.display = 'block';
-                    sakinBlokSelect.required = true;
-                    sakinDaireSelect.required = true;
-                    fetchBloklar(); // Site kodu değiştiğinde veya sakin seçildiğinde blokları çek
-                } else {
-                    sakinFields.style.display = 'none';
-                    sakinBlokSelect.required = false;
-                    sakinDaireSelect.required = false;
-                }
+        function toggleSakinFields() {
+          if (rolSakin.checked) {
+            sakinFields.style.display = "block";
+            sakinBlokSelect.required = true;
+            sakinDaireSelect.required = true;
+            // Site kodu doluysa blokları getir
+            if (siteKoduInput.value.trim().length === 3) {
+                fetchBloklar();
             }
+          } else {
+            sakinFields.style.display = "none";
+            sakinBlokSelect.required = false;
+            sakinDaireSelect.required = false;
+          }
+        }
 
-            rolYonetici.addEventListener('change', toggleSakinFields);
-            rolSakin.addEventListener('change', toggleSakinFields);
-            siteKoduInput.addEventListener('input', function() {
-                if(rolSakin.checked) {
-                    fetchBloklar();
-                }
-            });
-            sakinBlokSelect.addEventListener('change', fetchDaireler);
+        rolYonetici.addEventListener("change", toggleSakinFields);
+        rolSakin.addEventListener("change", toggleSakinFields);
 
-            function fetchBloklar() {
-                const siteKodu = siteKoduInput.value.trim();
-                sakinBlokSelect.innerHTML = '<option value="">Yükleniyor...</option>';
-                sakinDaireSelect.innerHTML = '<option value="">Önce Blok Seçin</option>';
-
-                if (siteKodu.length === 3) { // Sadece geçerli site kodu formatında ise istek at
-                    fetch(`{% url 'yonetim:ajax_bloklar' %}?site_kodu=${siteKodu}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            sakinBlokSelect.innerHTML = '<option value="">Blok Seçin</option>';
-                            if (data.bloklar && data.bloklar.length > 0) {
-                                data.bloklar.forEach(blok => {
-                                    sakinBlokSelect.innerHTML += `<option value="${blok.id}">${blok.ad}</option>`;
-                                });
-                            } else {
-                                sakinBlokSelect.innerHTML = '<option value="">Bu sitede blok bulunamadı</option>';
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Bloklar alınırken hata:', error);
-                            sakinBlokSelect.innerHTML = '<option value="">Hata oluştu</option>';
-                        });
-                } else {
-                     sakinBlokSelect.innerHTML = '<option value="">Geçerli Site Kodu Girin</option>';
-                }
-            }
-
-            function fetchDaireler() {
-                const blokId = sakinBlokSelect.value;
-                sakinDaireSelect.innerHTML = '<option value="">Yükleniyor...</option>';
-                if (blokId) {
-                    fetch(`{% url 'yonetim:ajax_daireler' %}?blok_id=${blokId}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            sakinDaireSelect.innerHTML = '<option value="">Daire Seçin</option>';
-                            if (data.daireler && data.daireler.length > 0) {
-                                data.daireler.forEach(daire => {
-                                    sakinDaireSelect.innerHTML += `<option value="${daire.id}">${daire.no}</option>`;
-                                });
-                            } else {
-                                sakinDaireSelect.innerHTML = '<option value="">Bu blokta boş daire bulunamadı</option>';
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Daireler alınırken hata:', error);
-                            sakinDaireSelect.innerHTML = '<option value="">Hata oluştu</option>';
-                        });
-                } else {
-                    sakinDaireSelect.innerHTML = '<option value="">Önce Blok Seçin</option>';
-                }
-            }
-            // Sayfa yüklendiğinde de kontrol et (eğer form post sonrası hatalıysa ve eski değerler varsa)
-            toggleSakinFields();
+        siteKoduInput.addEventListener("input", function () {
+          sakinBlokSelect.innerHTML = '<option value="">Önce Site Kodu Girin</option>';
+          sakinDaireSelect.innerHTML = '<option value="">Önce Blok Seçin</option>';
+          if (rolSakin.checked && siteKoduInput.value.trim().length === 3) {
+            fetchBloklar();
+          } else if (rolSakin.checked) {
+            sakinBlokSelect.innerHTML =
+              '<option value="">Geçerli Site Kodu Girin (3 karakter)</option>';
+          }
         });
+        sakinBlokSelect.addEventListener("change", fetchDaireler);
+
+        function fetchBloklar() {
+          const siteKodu = siteKoduInput.value.trim();
+          sakinBlokSelect.innerHTML = '<option value="">Yükleniyor...</option>';
+          sakinDaireSelect.innerHTML =
+            '<option value="">Önce Blok Seçin</option>';
+
+          if (siteKodu.length === 3) {
+            fetch(`{% url 'yonetim:ajax_bloklar' %}?site_kodu=${siteKodu}`)
+              .then((response) => {
+                if (!response.ok) {
+                  sakinBlokSelect.innerHTML =
+                    '<option value="">Site bulunamadı veya kod hatalı.</option>';
+                  throw new Error("Network response was not ok");
+                }
+                return response.json();
+              })
+              .then((data) => {
+                sakinBlokSelect.innerHTML =
+                  '<option value="">Blok Seçin</option>';
+                if (data.bloklar && data.bloklar.length > 0) {
+                  data.bloklar.forEach((blok) => {
+                    sakinBlokSelect.innerHTML += `<option value="${blok.id}">${blok.ad}</option>`;
+                  });
+                } else {
+                  sakinBlokSelect.innerHTML =
+                    '<option value="">Bu sitede blok bulunamadı.</option>';
+                }
+              })
+              .catch((error) => {
+                console.error("Bloklar alınırken hata:", error);
+                if (!sakinBlokSelect.querySelector('option[value=""]')) { // Eğer zaten bir hata mesajı yoksa
+                    sakinBlokSelect.innerHTML =
+                    '<option value="">Bloklar yüklenemedi (Hata)</option>';
+                }
+              });
+          } else {
+            sakinBlokSelect.innerHTML =
+              '<option value="">Geçerli Site Kodu Girin (3 karakter)</option>';
+          }
+        }
+
+        function fetchDaireler() {
+          const blokId = sakinBlokSelect.value;
+          sakinDaireSelect.innerHTML =
+            '<option value="">Yükleniyor...</option>';
+          if (blokId) {
+            fetch(`{% url 'yonetim:ajax_daireler' %}?blok_id=${blokId}`)
+              .then((response) => {
+                if (!response.ok) {
+                  sakinDaireSelect.innerHTML =
+                    '<option value="">Daireler yüklenemedi.</option>';
+                  throw new Error("Network response was not ok");
+                }
+                return response.json();
+              })
+              .then((data) => {
+                sakinDaireSelect.innerHTML =
+                  '<option value="">Daire Seçin</option>';
+                if (data.daireler && data.daireler.length > 0) {
+                  data.daireler.forEach((daire) => {
+                    sakinDaireSelect.innerHTML += `<option value="${daire.id}">${daire.no}</option>`;
+                  });
+                } else {
+                  sakinDaireSelect.innerHTML =
+                    '<option value="">Bu blokta boş daire bulunamadı.</option>';
+                }
+              })
+              .catch((error) => {
+                console.error("Daireler alınırken hata:", error);
+                 if (!sakinDaireSelect.querySelector('option[value=""]')) {
+                    sakinDaireSelect.innerHTML =
+                    '<option value="">Daireler yüklenemedi (Hata)</option>';
+                 }
+              });
+          } else {
+            sakinDaireSelect.innerHTML =
+              '<option value="">Önce Blok Seçin</option>';
+          }
+        }
+        // Sayfa yüklendiğinde, eğer "Sakin" rolü seçiliyse ve site kodu doluysa blokları getir.
+        if (rolSakin.checked && siteKoduInput.value.trim().length === 3) {
+            fetchBloklar();
+        } else {
+            toggleSakinFields(); // Diğer durumlar için normal toggle'ı çalıştır
+        }
+
+      });
     </script>
     {% endif %}
-</body>
+  </body>
 </html>
