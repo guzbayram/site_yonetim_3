@@ -1,130 +1,223 @@
-
-
+{% load static %}
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Site Bilgileri - {{ site.ad|default:"Yeni Site" }}</title>
+    <title>Site Bilgileri - {% if is_yeni_site %}Yeni Site Kurulumu{% else %}{{ site.ad|default:"Site Yönetimi" }}{% endif %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        body { background: #f0f2f5; }
-        .site-info-container { max-width: 700px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 30px; }
-        .site-title-display { font-weight: 600; text-align: center; margin-bottom: 25px; color: #333; font-size: 1.8rem;}
-        .form-label {font-weight: 500;}
+        body { background-color: #f8f9fa; font-family: "Segoe UI", sans-serif; padding-top: 20px; padding-bottom: 40px; }
+        .site-info-container { max-width: 850px; margin: auto; background: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); padding: 25px 35px; }
+        .site-title-display { font-weight: 600; text-align: center; margin-bottom: 30px; color: #343a40; font-size: 1.9rem; }
+        .form-label { font-weight: 500; color: #495057; font-size: 0.9rem; margin-bottom: 0.3rem; }
+        .form-control, .form-select { border-radius: 0.3rem; font-size: 0.95rem; padding: 0.5rem 0.75rem; }
+        .form-control:focus, .form-select:focus { border-color: #6a0dad; box-shadow: 0 0 0 0.2rem rgba(106, 13, 173, 0.2); }
+        .btn-primary { background-color: #6a0dad; border-color: #6a0dad; padding: 0.6rem 1.2rem; font-weight: 500; }
+        .btn-primary:hover { background-color: #540a8c; border-color: #540a8c; }
+        .btn-secondary { padding: 0.6rem 1.2rem; font-weight: 500; }
+        .btn-danger { font-size: 0.8rem; padding: 0.25rem 0.6rem; }
+        .blok-row { border: 1px solid #e9ecef; padding: 15px; border-radius: 6px; background-color: #fdfdff; margin-bottom: 15px; }
+        hr { margin-top: 2rem; margin-bottom: 2rem; }
+        .form-text{ font-size: 0.8rem; }
+        .section-title { color: #540a8c; border-bottom: 2px solid #f0e6f6; padding-bottom: 0.5rem; margin-bottom: 1.5rem; font-weight: 500; }
     </style>
 </head>
 <body>
     <div class="site-info-container">
-        <h2 class="site-title-display">{{ site.ad|default:"Site Bilgilerini Girin" }}</h2>
+        <h2 class="site-title-display">
+            {% if is_yeni_site %}Yeni Site Kurulumu{% else %}{{ site.ad|default:"Bilinmeyen Site" }} - Site Bilgileri{% endif %}
+        </h2>
         
         {% if messages %}
             {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'success' %}success{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
             {% endfor %}
         {% endif %}
 
         <form method="post" id="siteForm">
             {% csrf_token %}
-            <div class="mb-3">
-                <label for="site_adi_input" class="form-label">Site Adı</label>
-                <input type="text" name="site_adi" id="site_adi_input" class="form-control" placeholder="Örn: Huzur Sitesi" required value="{{ site.ad|default:'' }}" />
+            
+            <h4 class="section-title">Genel Site Bilgileri</h4>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label for="site_adi_input" class="form-label">Site Adı <span class="text-danger">*</span></label>
+                    <input type="text" name="site_adi" id="site_adi_input" class="form-control" placeholder="Örn: Huzur Sitesi" required value="{{ form_data.ad|default_if_none:'' }}" />
+                </div>
+                <div class="col-md-6">
+                    <label for="site_kodu_display" class="form-label">Site Kodu (Değiştirilemez)</label>
+                    <input type="text" name="site_kodu_display" id="site_kodu_display" class="form-control" value="{{ form_data.kod|default_if_none:'' }}" readonly disabled />
+                    <div class="form-text">Bu kod, sakinlerin sitenize kaydolması için kullanılacaktır.</div>
+                </div>
             </div>
             <div class="mb-3">
-                <label for="site_adresi" class="form-label">Site Adresi</label>
-                <input type="text" name="site_adresi" id="site_adresi" class="form-control" placeholder="Örn: Örnek Mah. Test Cad. No:123" required value="{{ site.adres|default:'' }}" />
+                <label for="site_adresi" class="form-label">Site Adresi <span class="text-danger">*</span></label>
+                <input type="text" name="site_adresi" id="site_adresi" class="form-control" placeholder="Örn: Örnek Mah. Test Cad. No:123" required value="{{ form_data.adres|default_if_none:'' }}" />
             </div>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label for="yonetici_tel" class="form-label">Yönetici Telefonu (Opsiyonel)</label>
+                    <input type="text" name="yonetici_tel" id="yonetici_tel" class="form-control" placeholder="Örn: 5551234567" value="{{ form_data.yonetici_tel|default_if_none:'' }}" />
+                </div>
+                <div class="col-md-6">
+                    <label for="aidat_miktari" class="form-label">Aylık Standart Aidat Tutarı (₺) (Opsiyonel)</label>
+                    <input type="number" name="aidat_miktari" id="aidat_miktari" class="form-control" placeholder="Örn: 250.00" step="0.01" value="{{ form_data.aidat_miktari|default_if_none:''|stringformat:'.2f' }}" />
+                </div>
+            </div>
+            
+            {% if not is_yeni_site and site %}
+            <hr>
+            <h4 class="section-title">Yönetici Daire Ataması (Opsiyonel)</h4>
             <div class="mb-3">
-                <label for="yonetici_tel" class="form-label">Yönetici Telefon</label>
-                <input type="text" name="yonetici_tel" id="yonetici_tel" class="form-control" placeholder="Örn: 5551234567" value="{{ site.yonetici_tel|default:'' }}" />
+                <label for="yonetici_daire_secimi" class="form-label">
+                    Yönetici olarak bu sitede bir daireniz varsa seçin:
+                    {% if yoneticinin_mevcut_dairesi_id %}
+                        {% for daire_obj in sitedeki_bos_ve_yoneticiye_ait_daireler %} {# Bu döngü aslında sadece mevcut daireyi bulmak için, daha iyi bir yolu olabilir view'de #}
+                            {% if daire_obj.id == yoneticinin_mevcut_dairesi_id %}
+                                <span class="badge bg-primary text-white ms-2">Mevcut: {{ daire_obj.blok.ad|upper }} - Daire {{ daire_obj.daire_no }}</span>
+                            {% endif %}
+                        {% endfor %}
+                    {% elif sitedeki_bos_ve_yoneticiye_ait_daireler|length == 0 %}
+                         <span class="badge bg-warning text-dark ms-2">Sitede size atanabilecek boş daire bulunmamaktadır.</span>
+                    {% endif %}
+                </label>
+                <select name="yonetici_daire_secimi" id="yonetici_daire_secimi" class="form-select" {% if not sitedeki_bos_ve_yoneticiye_ait_daireler and not yoneticinin_mevcut_dairesi_id %}disabled{% endif %}>
+                    <option value="bos_birak">-- Daire Atamasını Kaldır / Daire Seçme --</option>
+                    {% for daire_secim in sitedeki_bos_ve_yoneticiye_ait_daireler %}
+                        <option value="{{ daire_secim.id }}" {% if daire_secim.id == yoneticinin_mevcut_dairesi_id %}selected{% endif %}>
+                            {{ daire_secim.blok.ad|upper }} - Daire {{ daire_secim.daire_no }}
+                            {% if daire_secim.kullanici == request.user %} (Size Ait)
+                            {% else %} (Boş)
+                            {% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+                <div class="form-text">
+                    Bu sitede bir dairede ikamet ediyorsanız seçebilirsiniz. Seçtiğiniz daire size atanacaktır. Sadece boş veya size ait olanları seçebilirsiniz.
+                </div>
             </div>
-            <div class="mb-3">
-                <label for="aidat_miktari" class="form-label">Aylık Aidat Miktarı (₺)</label>
-                <input type="number" name="aidat_miktari" id="aidat_miktari" class="form-control" placeholder="Örn: 250" step="0.01" value="{{ site.aidat_miktari|default_if_none:'' }}" />
-            </div>
+            {% endif %}
 
             <hr>
-            <h5>Blok Bilgileri</h5>
+            <h4 class="section-title">Blok ve Daire Yapılandırması</h4>
             <div id="bloklar-container">
-                {% if bloklar %}
-                    {% for blok in bloklar %}
-                    <div class="row mb-3 blok-row align-items-end">
-                        <div class="col-md-5">
-                            <label class="form-label-sm">Blok Adı</label>
-                            <input type="text" name="blok_adi[]" class="form-control" placeholder="Örn: A Blok" required value="{{ blok.ad }}" />
-                        </div>
-                        <div class="col-md-5">
-                            <label class="form-label-sm">Daire Sayısı</label>
-                            <input type="number" name="daire_sayisi[]" class="form-control" placeholder="Örn: 10" min="1" required value="{{ blok.daire_sayisi }}" />
-                        </div>
-                        <div class="col-md-2">
-                            <button type="button" class="btn btn-sm btn-danger remove-blok w-100" onclick="removeBlok(this)">Kaldır</button>
-                        </div>
+                {% for blok_form_item in bloklar_ve_daireleri %} {# View'den gelen context adı #}
+                <div class="row mb-3 blok-row align-items-end">
+                    <input type="hidden" name="blok_id[]" value="{{ blok_form_item.id|default:'' }}">
+                    <div class="col-md-5">
+                        <label class="form-label">Blok Adı <span class="text-danger">*</span></label>
+                        <input type="text" name="blok_adi[]" class="form-control" placeholder="Örn: A BLOK" required value="{{ blok_form_item.ad|default:''|upper }}" />
                     </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="row mb-3 blok-row align-items-end">
-                        <div class="col-md-5">
-                            <label class="form-label-sm">Blok Adı</label>
-                            <input type="text" name="blok_adi[]" class="form-control" placeholder="Örn: A Blok" required />
-                        </div>
-                        <div class="col-md-5">
-                            <label class="form-label-sm">Daire Sayısı</label>
-                            <input type="number" name="daire_sayisi[]" class="form-control" placeholder="Örn: 10" min="1" required />
-                        </div>
-                        <div class="col-md-2">
-                             </div>
+                    <div class="col-md-5">
+                        <label class="form-label">Bu Bloktaki Daire Sayısı <span class="text-danger">*</span></label>
+                        <input type="number" name="daire_sayisi[]" class="form-control" placeholder="Örn: 10" min="1" required value="{{ blok_form_item.daire_sayisi|default:'' }}" />
                     </div>
-                {% endif %}
+                    <div class="col-md-2 pt-3">
+                        <button type="button" class="btn btn-danger w-100 remove-blok" onclick="removeBlok(this)">Kaldır</button>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="row mb-3 blok-row align-items-end">
+                    <input type="hidden" name="blok_id[]" value="">
+                    <div class="col-md-5">
+                        <label class="form-label">Blok Adı <span class="text-danger">*</span></label>
+                        <input type="text" name="blok_adi[]" class="form-control" placeholder="Örn: A BLOK" required />
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label">Bu Bloktaki Daire Sayısı <span class="text-danger">*</span></label>
+                        <input type="number" name="daire_sayisi[]" class="form-control" placeholder="Örn: 10" min="1" required />
+                    </div>
+                    <div class="col-md-2 pt-3">
+                         <button type="button" class="btn btn-danger w-100 remove-blok" onclick="removeBlok(this)" style="display: none;">Kaldır</button>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
             <div class="mb-3">
-                <button type="button" class="btn btn-secondary w-100" id="add-blok">+ Blok Ekle</button>
+                <button type="button" class="btn btn-outline-secondary w-100" id="add-blok"><i class="fas fa-plus me-2"></i>Yeni Blok Ekle</button>
             </div>
             <hr>
-            <button type="submit" class="btn btn-primary w-100 mb-2">BİLGİLERİ KAYDET</button>
-            <a href="{% url 'yonetim:panel' %}" class="btn btn-outline-secondary w-100">Panele Dön</a>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    {% if is_yeni_site %}SİTEYİ OLUŞTUR VE BİLGİLERİ KAYDET{% else %}BİLGİLERİ GÜNCELLE{% endif %}
+                </button>
+                {% if not is_yeni_site and site %}
+                <a href="{% url 'yonetim:panel' %}" class="btn btn-secondary">Panele Dön</a>
+                {% endif %}
+            </div>
         </form>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            var siteAdiInput = document.getElementById("site_adi_input");
-            var siteTitleDisplay = document.querySelector(".site-title-display");
-            if (siteAdiInput && siteTitleDisplay) {
-                siteAdiInput.addEventListener("input", function () {
-                    siteTitleDisplay.textContent = siteAdiInput.value || "Site Bilgilerini Girin";
+            function updateBlokAdInput(inputElement) {
+                if (inputElement && inputElement.name === 'blok_adi[]') {
+                    inputElement.value = inputElement.value.toUpperCase();
+                }
+            }
+            document.getElementById('bloklar-container').addEventListener('input', function(event) {
+                updateBlokAdInput(event.target);
+            });
+             document.querySelectorAll("input[name='blok_adi[]']").forEach(updateBlokAdInput);
+
+
+            function toggleFirstRemoveButton() {
+                var blokRows = document.querySelectorAll(".blok-row");
+                blokRows.forEach(function(row, index) {
+                    var removeButton = row.querySelector('.remove-blok');
+                    if (removeButton) {
+                        removeButton.style.display = (blokRows.length > 1) ? 'block' : 'none';
+                    }
                 });
             }
+            toggleFirstRemoveButton();
+
 
             document.getElementById("add-blok").onclick = function () {
                 var container = document.getElementById("bloklar-container");
                 var newBlokRow = document.createElement("div");
                 newBlokRow.className = "row mb-3 blok-row align-items-end";
                 newBlokRow.innerHTML = `
+                    <input type="hidden" name="blok_id[]" value="">
                     <div class="col-md-5">
-                        <label class="form-label-sm">Blok Adı</label>
-                        <input type="text" name="blok_adi[]" class="form-control" placeholder="Örn: B Blok" required />
+                        <label class="form-label">Blok Adı <span class="text-danger">*</span></label>
+                        <input type="text" name="blok_adi[]" class="form-control" placeholder="Örn: B BLOK" required />
                     </div>
                     <div class="col-md-5">
-                        <label class="form-label-sm">Daire Sayısı</label>
+                        <label class="form-label">Bu Bloktaki Daire Sayısı <span class="text-danger">*</span></label>
                         <input type="number" name="daire_sayisi[]" class="form-control" placeholder="Örn: 8" min="1" required />
                     </div>
-                    <div class="col-md-2">
-                        <button type="button" class="btn btn-sm btn-danger remove-blok w-100" onclick="removeBlok(this)">Kaldır</button>
+                    <div class="col-md-2 pt-3">
+                        <button type="button" class="btn btn-danger w-100 remove-blok" onclick="removeBlok(this)">Kaldır</button>
                     </div>
                 `;
                 container.appendChild(newBlokRow);
+                // Yeni eklenen input için de upperCase event listener'ı eklenebilir veya genel event listener çalışır.
+                var newBlokAdInput = newBlokRow.querySelector("input[name='blok_adi[]']");
+                if (newBlokAdInput) { // Sadece input varsa event listener ekle
+                   newBlokAdInput.addEventListener('input', function(event) {
+                       updateBlokAdInput(event.target);
+                   });
+                }
+                toggleFirstRemoveButton(); 
             };
         });
 
         function removeBlok(buttonEl) {
-            // En az bir blok satırı kalmasını sağlamak için kontrol edebilirsiniz.
-            // if (document.querySelectorAll(".blok-row").length > 1) {
             buttonEl.closest(".blok-row").remove();
-            // } else {
-            //     alert("En az bir blok olmalıdır.");
-            // }
+            // Kaldırdıktan sonra ilk bloktaki butonun durumunu tekrar kontrol et
+            var blokRows = document.querySelectorAll(".blok-row");
+            blokRows.forEach(function(row, index) {
+                var removeButton = row.querySelector('.remove-blok');
+                if (removeButton) {
+                    removeButton.style.display = (blokRows.length > 1) ? 'block' : 'none';
+                }
+            });
         }
     </script>
 </body>
