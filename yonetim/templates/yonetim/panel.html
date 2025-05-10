@@ -187,11 +187,21 @@
             font-size: 0.85rem; /* Yazı tipi boyutu */
             border-top: 1px solid #e9ecef; /* Üst kenarlık */
             flex-shrink: 0; /* Flexbox içinde küçülmesini engeller */
+            position: -webkit-sticky; /* Safari tarayıcıları için destek */
+            position: sticky; /* Yapışkan konumlandırma */
+            bottom: 0; /* Görüntü alanının (viewport) en altına yapışır */
+            z-index: 1020; /* Diğer elementlerin (modal, sidebar hariç) üzerinde kalması için */
         }
 
         /* .stats-row - İstatistik kartlarının bulunduğu satır */
         .stats-row {
             margin-bottom: 1.5rem; /* Alt dış kenar boşluğu */
+            position: -webkit-sticky; /* Safari tarayıcıları için destek */
+            position: sticky; /* Yapışkan konumlandırma */
+            top: 0; /* İçinde bulunduğu .container-panel'in içerik alanının üstüne yapışır */
+            z-index: 100; /* Diğer içeriklerin üzerinde kalması için yığınlama sırası */
+            background-color: var(--theme-very-light-purple-bg); /* Arka plan rengi (kaydırma sırasında altındaki içeriğin görünmemesi için) */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Yapışkan olduğunda görsel ayrım için hafif gölge */
         }
 
         /* .stat-card - İstatistik kartı genel stili */
@@ -334,7 +344,7 @@
         /* .table td, .table th - Tablo hücreleri ve başlıkları için genel stil */
         .table td, .table th {
             padding: 0.5rem; /* İç kenar boşluğu */
-            font-size: 0.85rem; /* Yazı tipi boyutu */
+            font-size: 1.1rem; /* Yazı tipi boyutu */
             vertical-align: middle; /* Dikeyde ortalama */
         }
 
@@ -375,7 +385,6 @@
             padding: .2rem .4rem; /* İç kenar boşluğu */
             font-size: .75rem; /* Yazı tipi boyutu */
         }
-
 
         /* @media (max-width: 991.98px) - Mobil ve Tablet görünümleri için CSS kuralları (Bootstrap lg breakpoint'i) */
         @media (max-width: 991.98px) {
@@ -513,33 +522,43 @@
             }
         }
 
-        /* .text-positive ve .text-negative zaten yukarıda tanımlanmıştı, tekrarına gerek yok. */
-        /* Yorum: Bu bloklar zaten :root içinde tanımlanan değişkenleri kullanıyor veya yukarıda benzerleri var. */
-        /*
-        .text-positive { color: #28a745 !important; }
-        .text-negative { color: #dc3545 !important; }
-        */
-
-
-        /* İstatistik kartları satırının (Toplam Tahsil Edilen Aidat vb.)
-           scroll edilebilir ana içerik alanının en üstüne yapışık kalması için */
-        .stats-row {
-            position: -webkit-sticky; /* Safari tarayıcıları için destek */
-            position: sticky; /* Yapışkan konumlandırma */
-            top: 0; /* İçinde bulunduğu .container-panel'in içerik alanının üstüne yapışır */
-            z-index: 100; /* Diğer içeriklerin üzerinde kalması için yığınlama sırası */
-            background-color: var(--theme-very-light-purple-bg); /* Arka plan rengi (kaydırma sırasında altındaki içeriğin görünmemesi için) */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Yapışkan olduğunda görsel ayrım için hafif gölge */
-            /* margin-bottom: 1.5rem; Bu stil zaten yukarıda .stats-row için tanımlı */
+        /* Django Mesajları için Eklenen Stiller */
+        /* Mesaj bildirimlerinin ekranın altında sabitlenmesi için sarmalayıcı stil (desktop için) */
+        .fixed-bottom-messages {
+            position: fixed; /* Sayfaya göre sabit konum */
+            bottom: 20px;    /* Alttan 20px boşluk */
+            left: 50%;       /* Ortalamak için soldan %50 */
+            transform: translateX(-50%); /* Yatayda tam ortalamak için */
+            z-index: 1050;   /* Diğer Bootstrap elemanlarının (örn: modal arkaplanı) üzerinde olması için yüksek z-index */
+            width: auto;     /* İçeriğe göre genişlik */
+            max-width: 80%;  /* Maksimum genişlik, çok uzun mesajlar için */
+            display: flex;   /* Birden fazla mesaj olursa yan yana veya alt alta yönetmek için */
+            flex-direction: column; /* Mesajları alt alta sıralar */
+            gap: 0.5rem;     /* Mesajlar arası boşluk */
         }
 
-        /* Alt bilgi (footer) alanının sayfanın en altına yapışık kalması için */
-        footer.app-footer {
-            position: -webkit-sticky; /* Safari tarayıcıları için destek */
-            position: sticky; /* Yapışkan konumlandırma */
-            bottom: 0; /* Görüntü alanının (viewport) en altına yapışır */
-            z-index: 1020; /* Diğer elementlerin (modal, sidebar hariç) üzerinde kalması için */
-            /* Diğer stiller (background-color, padding vb.) yukarıda zaten tanımlı */
+        /* Mobil cihazlarda (767.98px altı) sabitlenmiş mesaj pozisyonunu düzenler */
+        @media (max-width: 767.98px) {
+            .fixed-bottom-messages {
+                position: relative; /* Sabit pozisyonu kaldır, normal akışa döner */
+                bottom: auto;       /* Alt pozisyonu sıfırla */
+                left: auto;         /* Sol pozisyonu sıfırla */
+                transform: none;    /* Transformu sıfırla */
+                width: 100%;        /* Tam genişlik */
+                max-width: 100%;    /* Maksimum genişlik */
+                margin-top: 1rem;   /* Üstten biraz boşluk bırakır */
+                padding-left: 0.75rem;  /* Mobil container-panel padding'i ile uyumlu sol boşluk */
+                padding-right: 0.75rem; /* Mobil container-panel padding'i ile uyumlu sağ boşluk */
+                z-index: auto;      /* Z-index'i normale döndür */
+            }
+            .fixed-bottom-messages .alert {
+                margin-bottom: 0.5rem !important; /* Alt alta mesajlar için boşluk, !important gerekebilir Bootstrap'i ezmek için */
+            }
+        }
+
+        /* Alert mesajlarının içindeki kapatma butonu için stil ince ayarı (opsiyonel) */
+        .fixed-bottom-messages .alert .btn-close {
+            padding: 0.5rem 0.75rem; /* Biraz daha kompakt padding */
         }
    
     </style>
@@ -579,22 +598,23 @@
         </div>
     </aside>
 
-
-
     <div class="main-content-wrapper">
-    <div class="main"></div>
+        {% if messages %}
+        <div class="fixed-bottom-messages">
+            {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm" role="alert" style="font-size: 0.9rem; padding: 0.75rem 1.25rem;">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
         <div class="container-fluid container-panel">
-            {% if messages %}
-                {% for message in messages %}
-                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show mt-2 mb-2" role="alert" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
-                    {{ message }} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 0.75rem 1rem;"></button>
-                </div>
-                {% endfor %}
-            {% endif %}
+            {# Eski mesaj bloğu buradan kaldırıldı #}
 
             {% if request.user.is_yonetici %}
-            <div class="row stats-row"> 
-                <div class="col-lg-4 col-md-6 mb-3 mb-lg-0">
+            <div class="row stats-row"> <div class="col-lg-4 col-md-6 mb-3 mb-lg-0">
                     <div class="stat-card gelir">
                         <h5>{{ toplam_gelir_aidatlar|floatformat:0|intcomma }} ₺</h5>
                         <p>Toplam Tahsil Edilen Aidat</p>
@@ -638,7 +658,9 @@
                                     </thead>
                                     <tbody>
                                     {% for ozet in aidat_listesi_ozet %}
-                                        <tr {% if ozet.is_current_user_flat %}class="table-info fw-bold"{% endif %}> <td>{{ ozet.blok_daire }}</td><td>{{ ozet.sakin }}</td>
+                                        <tr {% if ozet.is_current_user_flat %}class="table-info fw-bold"{% endif %}> 
+                                            <td>{{ ozet.blok_daire }}</td>
+                                            <td>{{ ozet.sakin }}</td>
                                             <td class="text-end text-negative">{{ ozet.yillik_borc|floatformat:0|intcomma }} ₺</td>
                                             <td class="text-end {% if ozet.odenen > 0 %}text-positive{% else %}text-neutral{% endif %}">{{ ozet.odenen|floatformat:0|intcomma }} ₺</td>
                                             <td class="text-end {% if ozet.bakiye >= 0 %}text-positive{% else %}text-negative{% endif %}">
@@ -741,30 +763,13 @@
                     {% endif %} </div>
                 {% endif %} </div>
         </div>
-    
-        </div>
-        
-
-
-   
-
-
-
-
-
-
-
-
-
+        <footer class="app-footer"> <small>&copy; {% now "Y" %} {{ site.ad|default:"Site Yönetim Sistemi" }}. Tüm hakları saklıdır.</small>
+        </footer>
     </div> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    
-    
-    
     <script>
         // Sayfa tamamen yüklendiğinde çalışacak JavaScript kodları
         document.addEventListener('DOMContentLoaded', function () {
-            // URL'deki # (hash) değerine göre ilgili sekmeyi aktif et
+            // Sayfa yüklendiğinde URL'deki hash'e göre ilgili sekmeyi aktif et
             var hash = window.location.hash;
             if (hash) {
                 var tabToActivate = document.querySelector('.nav-tabs button[data-bs-target="' + hash + '"]');
@@ -775,14 +780,31 @@
             }
 
             // Sekmelerden biri gösterildiğinde URL'deki # (hash) değerini güncelle (isteğe bağlı)
-            // Bu, sayfa yenilendiğinde veya link paylaşıldığında doğru sekmenin açılmasına yardımcı olur
             var tabElms = document.querySelectorAll('button[data-bs-toggle="tab"]');
             tabElms.forEach(function (tabElm) {
                 tabElm.addEventListener('shown.bs.tab', function (event) {
-                    // event.target seçilen yeni sekme butonudur
-                    // event.relatedTarget önceden seçili olan sekme butonudur
                     history.replaceState(null, null, event.target.dataset.bsTarget); // Tarayıcı geçmişini değiştirmeden URL'yi güncelle
                 });
+            });
+
+            // Otomatik kapanacak mesajlar için (Django Messages)
+            const autoDismissMessages = document.querySelectorAll('.fixed-bottom-messages .alert');
+            autoDismissMessages.forEach(function(alertElement) {
+                setTimeout(function() {
+                    // Bootstrap'in alert kapatma yöntemini kullan
+                    var alertInstance = bootstrap.Alert.getInstance(alertElement);
+                    if (alertInstance) {
+                        alertInstance.close();
+                    } else {
+                        // Fallback: Eğer Bootstrap instance bulunamazsa manuel gizle
+                        // Bu durum normalde olmamalı ama bir önlem
+                        // alertElement.style.display = 'none'; // Animasyon olmadan direkt gizler
+                        // Daha yumuşak bir geçiş için Bootstrap'in fade out class'larını ekleyebiliriz
+                        alertElement.classList.remove('show');
+                        // İsteğe bağlı: animasyon bittikten sonra elementi DOM'dan kaldırabilirsiniz
+                        // alertElement.addEventListener('transitionend', () => alertElement.remove());
+                    }
+                }, 4000); // 2000 milisaniye = 2 saniye
             });
         });
     </script>

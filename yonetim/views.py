@@ -130,7 +130,7 @@ def panel(request):
         bu_yil_odenen_tutar = Aidat.objects.filter(
             daire=daire_obj_loop, tarih__gte=start_of_year, tarih__lte=end_of_year # daire_obj -> daire_obj_loop
         ).aggregate(toplam_odenen=Sum('tutar'))['toplam_odenen'] or Decimal('0.00')
-        bakiye = yillik_aidat_borcu_bir_daire_icin - bu_yil_odenen_tutar
+        bakiye = bu_yil_odenen_tutar - yillik_aidat_borcu_bir_daire_icin
         daire_aidat_ozetleri_listesi.append({
             'daire': daire_obj_loop, # daire_obj -> daire_obj_loop
             'blok_daire': f"{daire_obj_loop.blok.ad.upper()} - {daire_obj_loop.daire_no}", # daire_obj -> daire_obj_loop
