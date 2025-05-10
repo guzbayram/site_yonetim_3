@@ -8,93 +8,539 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* :root - CSS değişkenlerini tanımlar, tema renkleri ve boyutları için kullanılır */
         :root {
-            --theme-primary-purple: #6a0dad; --theme-dark-purple: #540a8c; --theme-light-purple-accent: #8344c2;
-            --theme-very-light-purple-bg: #f5efff; --theme-sidebar-bg: var(--theme-primary-purple);
-            --theme-sidebar-link-color: #e0e0e0; --theme-sidebar-link-hover-color: #fff;
-            --theme-sidebar-link-hover-bg: var(--theme-light-purple-accent);
-            --sidebar-width: 250px; --mobile-bottom-bar-height: 60px;
-            --theme-text-light: #fff; --theme-text-dark: #333; --theme-border-color: #ddd;
-            --text-green: #28a745; --text-red: #dc3545; --text-black: #212529;
+            --theme-primary-purple: #6a0dad; /* Ana tema rengi - Mor */
+            --theme-dark-purple: #540a8c;    /* Koyu mor tonu */
+            --theme-light-purple-accent: #8344c2; /* Açık mor vurgu rengi */
+            --theme-very-light-purple-bg: #f5efff; /* Çok açık mor arka plan rengi */
+            --theme-sidebar-bg: var(--theme-primary-purple); /* Kenar çubuğu arka plan rengi */
+            --theme-sidebar-link-color: #e0e0e0;       /* Kenar çubuğu bağlantı rengi */
+            --theme-sidebar-link-hover-color: #fff;    /* Kenar çubuğu bağlantı hover rengi */
+            --theme-sidebar-link-hover-bg: var(--theme-light-purple-accent); /* Kenar çubuğu bağlantı hover arka plan rengi */
+            --sidebar-width: 250px;                    /* Kenar çubuğu genişliği */
+            --mobile-bottom-bar-height: 60px;          /* Mobil alt bar yüksekliği */
+            --theme-text-light: #fff;                  /* Açık renk metin (beyaz) */
+            --theme-text-dark: #333;                   /* Koyu renk metin (koyu gri) */
+            --theme-border-color: #ddd;                /* Kenarlık rengi */
+            --text-green: #28a745;                     /* Yeşil metin rengi (pozitif durumlar için) */
+            --text-red: #dc3545;                       /* Kırmızı metin rengi (negatif durumlar için) */
+            --text-black: #212529;                     /* Siyah metin rengi (nötr durumlar için) */
         }
-        html { height: 100%; }
-        body { display: flex; min-height: 100vh; background-color: var(--theme-very-light-purple-bg); font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; margin: 0; }
-        .sidebar { width: var(--sidebar-width); background-color: var(--theme-sidebar-bg); color: var(--theme-text-light); position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; z-index: 1030; display: flex; flex-direction: column; padding: 0; transition: width 0.3s ease, transform 0.3s ease; }
-        .sidebar .sidebar-header { padding: 1rem; text-align: center; border-bottom: 1px solid var(--theme-light-purple-accent); }
-        .sidebar .sidebar-header .site-brand { font-size: 2.5rem; font-weight: 600; color: var(--theme-text-light); text-decoration: none; display: block; }
 
-        .sidebar .user-info-wrapper { padding: 1rem; border-bottom: 1px solid var(--theme-light-purple-accent); text-align: left; display: flex; flex-direction: column; justify-content: center; min-height: 90px; }
-        .sidebar .user-info-wrapper .welcome-text { font-size: 0.9rem; opacity: 0.9; display: block; margin-bottom: 0.15rem; }
-        .sidebar .user-info-wrapper .user-fullname { font-size: 1rem; font-weight: 500; display: block; margin-bottom: 0.15rem; color: #fff; }
-        .sidebar .user-info-wrapper .user-daire { font-size: 0.8rem; opacity: 0.8; display: block; }
+        /* html - Temel HTML elementi için yükseklik ayarı */
+        html {
+            height: 100%; /* Sayfanın tamamını kaplaması için */
+        }
 
-        .sidebar .nav-links { list-style: none; padding: 0; margin: 0; flex-grow: 1; }
-        .sidebar .nav-links .nav-item .nav-link { color: var(--theme-sidebar-link-color); padding: 0.8rem 1rem; display: block; font-size: 0.95rem; text-decoration: none; border-left: 3px solid transparent; transition: background-color 0.2s ease, color 0.2s ease, border-left-color 0.2s ease; }
+        /* body - Sayfa gövdesi için temel stiller */
+        body {
+            display: flex; /* Flexbox layout kullanımı (desktop için sidebar ve ana içerik yan yana) */
+            min-height: 100vh; /* Minimum yükseklik, ekran yüksekliği kadar */
+            background-color: var(--theme-very-light-purple-bg); /* Sayfa arka plan rengi */
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; /* Genel yazı tipi ailesi */
+            margin: 0; /* Dış kenar boşluğunu sıfırlar */
+        }
+
+        /* .sidebar - Sol kenar çubuğu stilleri */
+        .sidebar {
+            width: var(--sidebar-width); /* Kenar çubuğu genişliği (değişkenden alır) */
+            background-color: var(--theme-sidebar-bg); /* Arka plan rengi */
+            color: var(--theme-text-light); /* Metin rengi */
+            position: fixed; /* Sabit konumlandırma (sayfa kaysa bile yerinde kalır) */
+            top: 0; /* Üstten hizalama */
+            left: 0; /* Soldan hizalama */
+            height: 100vh; /* Tam ekran yüksekliği */
+            overflow-y: auto; /* İçerik sığmazsa dikey kaydırma çubuğu çıkar */
+            z-index: 1030; /* Diğer elementlerin üzerinde görünmesi için yığınlama sırası */
+            display: flex; /* İç elementleri flexbox ile yönetir */
+            flex-direction: column; /* İç elementleri dikeyde sıralar */
+            padding: 0; /* İç kenar boşluğunu sıfırlar */
+            transition: width 0.3s ease, transform 0.3s ease; /* Genişlik ve transform için yumuşak geçiş efekti */
+        }
+
+        /* .sidebar .sidebar-header - Kenar çubuğu başlık bölümü */
+        .sidebar .sidebar-header {
+            padding: 1rem; /* İç kenar boşluğu */
+            text-align: center; /* Metni ortalar */
+            border-bottom: 1px solid var(--theme-light-purple-accent); /* Alt kenarlık */
+        }
+
+        /* .sidebar .sidebar-header .site-brand - Site logosu/markası */
+        .sidebar .sidebar-header .site-brand {
+            font-size: 2.5rem; /* Yazı tipi boyutu */
+            font-weight: 600; /* Yazı tipi kalınlığı */
+            color: var(--theme-text-light); /* Metin rengi */
+            text-decoration: none; /* Metin altı çizgiyi kaldırır */
+            display: block; /* Blok element olarak davranır */
+        }
+
+        /* .sidebar .user-info-wrapper - Kullanıcı bilgi alanı */
+        .sidebar .user-info-wrapper {
+            padding: 1rem; /* İç kenar boşluğu */
+            border-bottom: 1px solid var(--theme-light-purple-accent); /* Alt kenarlık */
+            text-align: left; /* Metni sola hizalar */
+            display: flex; /* Flexbox kullanımı */
+            flex-direction: column; /* Dikey sıralama */
+            justify-content: center; /* Dikeyde ortalama */
+            min-height: 90px; /* Minimum yükseklik */
+        }
+
+        /* .sidebar .user-info-wrapper .welcome-text - Hoşgeldiniz metni */
+        .sidebar .user-info-wrapper .welcome-text {
+            font-size: 0.9rem; /* Yazı tipi boyutu */
+            opacity: 0.9; /* Hafif şeffaflık */
+            display: block; /* Blok element */
+            margin-bottom: 0.15rem; /* Alt dış kenar boşluğu */
+        }
+
+        /* .sidebar .user-info-wrapper .user-fullname - Kullanıcı tam adı */
+        .sidebar .user-info-wrapper .user-fullname {
+            font-size: 1rem; /* Yazı tipi boyutu */
+            font-weight: 500; /* Yazı tipi kalınlığı */
+            display: block; /* Blok element */
+            margin-bottom: 0.15rem; /* Alt dış kenar boşluğu */
+            color: #fff; /* Metin rengi (beyaz) */
+        }
+
+        /* .sidebar .user-info-wrapper .user-daire - Kullanıcı daire bilgisi */
+        .sidebar .user-info-wrapper .user-daire {
+            font-size: 0.8rem; /* Yazı tipi boyutu */
+            opacity: 0.8; /* Hafif şeffaflık */
+            display: block; /* Blok element */
+        }
+
+        /* .sidebar .nav-links - Navigasyon bağlantıları listesi */
+        .sidebar .nav-links {
+            list-style: none; /* Liste işaretlerini kaldırır */
+            padding: 0; /* İç kenar boşluğunu sıfırlar */
+            margin: 0; /* Dış kenar boşluğunu sıfırlar */
+            flex-grow: 1; /* Kalan alanı doldurur (dikeyde) */
+        }
+
+        /* .sidebar .nav-links .nav-item .nav-link - Navigasyon bağlantısı */
+        .sidebar .nav-links .nav-item .nav-link {
+            color: var(--theme-sidebar-link-color); /* Bağlantı metin rengi */
+            padding: 0.8rem 1rem; /* İç kenar boşluğu */
+            display: block; /* Blok element */
+            font-size: 0.95rem; /* Yazı tipi boyutu */
+            text-decoration: none; /* Metin altı çizgiyi kaldırır */
+            border-left: 3px solid transparent; /* Sol kenarlık (aktif durum için) */
+            transition: background-color 0.2s ease, color 0.2s ease, border-left-color 0.2s ease; /* Yumuşak geçiş efektleri */
+        }
+
+        /* Navigasyon bağlantısı üzerine gelince (hover) ve aktif durum stilleri */
         .sidebar .nav-links .nav-item .nav-link:hover,
-        .sidebar .nav-links .nav-item .nav-link.active { background-color: var(--theme-sidebar-link-hover-bg); color: var(--theme-sidebar-link-hover-color); border-left-color: var(--theme-very-light-purple-bg); }
-        .sidebar .nav-links .nav-item .nav-link .link-text { margin-left: 0.5rem; }
-        .sidebar .sidebar-footer { padding: 0.8rem 1rem; border-top: 1px solid var(--theme-light-purple-accent); margin-top: auto; }
-        .sidebar .sidebar-footer .nav-link { color: var(--theme-sidebar-link-color); font-size: 0.95rem; text-decoration: none; display:block; }
-        .sidebar .sidebar-footer .nav-link:hover { color: var(--theme-sidebar-link-hover-color); }
-        .main-content-wrapper { flex-grow: 1; display: flex; flex-direction: column; margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); min-height: 100vh; transition: margin-left 0.3s ease, width 0.3s ease;}
-        .container-panel { flex-grow: 1; overflow-y: auto; padding: 1.25rem; }
-        footer.app-footer { background-color: #f8f9fa; color: var(--theme-dark-gray); padding: 0.75rem 0; text-align: center; font-size: 0.85rem; border-top: 1px solid #e9ecef; flex-shrink: 0; }
-
-        .stats-row { margin-bottom: 1.5rem; }
-        .stat-card { background-color: var(--theme-primary-purple); color: var(--theme-text-light); border-radius: 8px; padding: 1.25rem 1rem; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 1rem; }
-        .stat-card h5 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
-        .stat-card p { font-size: 0.9rem; margin-bottom: 0; opacity: 0.9; }
-        .stat-card.gelir h5, .stat-card.bakiye-pozitif h5 { color: #a7f3d0; }
-        .stat-card.gider h5, .stat-card.bakiye-negatif h5 { color: #fca5a5; }
-
-        .text-positive { color: var(--text-green) !important; font-weight: bold; }
-        .text-negative { color: var(--text-red) !important; font-weight: bold; }
-        .text-neutral { color: var(--text-black) !important; }
-        .card { margin-bottom: 15px; box-shadow: 0 1px 5px rgba(0,0,0,0.06); border: 1px solid var(--theme-border-color); border-radius: 0.4rem; }
-        .card-header { background-color: var(--theme-light-purple-accent); color: var(--theme-text-light); font-weight: 500; padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--theme-border-color); border-top-left-radius: calc(0.4rem - 1px); border-top-right-radius: calc(0.4rem - 1px); }
-        .card-body { padding: 0.75rem; }
-        .card-title { font-size: 1rem; margin-bottom: 0.75rem; color: var(--theme-text-dark); font-weight:500; }
-        .nav-tabs { border-bottom: 1px solid var(--theme-border-color); margin-bottom: 0; }
-        .nav-tabs .nav-link { color: var(--theme-primary-purple); border: 1px solid transparent; border-top-left-radius: 0.25rem; border-top-right-radius: 0.25rem; font-weight: 500; padding: 0.6rem 1rem; font-size: 0.9rem; }
-        .nav-tabs .nav-link.active { color: var(--theme-dark-purple); background-color: #fff; border-color: var(--theme-border-color) var(--theme-border-color) #fff; }
-        .tab-content > .tab-pane { background-color: #fff; border: 1px solid var(--theme-border-color); border-top: none; padding: 1rem; border-bottom-left-radius: 0.25rem; border-bottom-right-radius: 0.25rem; }
-        .table-responsive { max-height: calc(100vh - 380px); min-height: 200px; overflow-y: auto; }
-        .sticky-header th { position: sticky; top: -1px; background: #f8f9fa; z-index: 10; box-shadow: inset 0 -2px 0 #dee2e6; font-size: 0.85rem; }
-        .table td, .table th { padding: 0.5rem; font-size: 0.85rem; vertical-align: middle; }
-        .btn-custom-purple { background-color: var(--theme-primary-purple); color: white; border: none; padding: 0.4rem 0.8rem; font-weight: 500; font-size: 0.9rem; }
-        .btn-custom-purple:hover { background-color: var(--theme-dark-purple); color: white; }
-        .form-label { font-weight: 500; color: var(--theme-text-dark); font-size: 0.85rem; margin-bottom: 0.2rem; }
-        .form-control-sm, .form-select-sm { font-size: 0.85rem !important; padding: 0.3rem 0.6rem !important; }
-        select.form-select-sm { padding-right: 1.5rem; }
-        .btn-sm { padding: .2rem .4rem; font-size: .75rem; }
-
-        @media (max-width: 991.98px) { /* Mobil ve Tablet */
-            body { display: block; padding-bottom: var(--mobile-bottom-bar-height); }
-            .sidebar { width: 100%; height: var(--mobile-bottom-bar-height); min-height: var(--mobile-bottom-bar-height); position: fixed; bottom: 0; left: 0; top: auto; flex-direction: row; justify-content: space-around; align-items: center; padding: 0 0.5rem; border-top: 1px solid var(--theme-light-purple-accent); box-shadow: 0 -2px 5px rgba(0,0,0,0.1); }
-            .sidebar .sidebar-header, .sidebar .user-info-wrapper { display: none; }
-            .sidebar .nav-links { display: flex; flex-direction: row; justify-content: space-around; align-items: center; width: 100%; height: 100%; }
-            .sidebar .nav-links .nav-item { margin-bottom: 0; flex-grow: 1; text-align: center; height: 100%; }
-            .sidebar .nav-links .nav-item .nav-link { padding: 0.5rem; font-size: 0.75rem; white-space: nowrap; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; border-left: none; border-bottom: 3px solid transparent; }
-            .sidebar .nav-links .nav-item .nav-link:hover, .sidebar .nav-links .nav-item .nav-link.active { background-color: transparent; color: var(--theme-sidebar-link-hover-color); border-left-color: transparent; border-bottom-color: var(--theme-very-light-purple-bg); }
-            .sidebar .nav-links .nav-item .nav-link .link-text { margin-left: 0; margin-top: 2px; }
-            .sidebar .sidebar-footer { border-top: none; padding: 0; height: 100%; display: flex; align-items: center; flex-grow: 1; max-width: 25%; margin-top:0; }
-            .sidebar .sidebar-footer .nav-link { padding: 0.5rem; font-size: 0.75rem; white-space: nowrap; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; }
-            .main-content-wrapper { margin-left: 0; width: 100%; }
-            .container-panel { padding: 0.75rem; }
-            .table-responsive { max-height: calc(100vh - 320px); }
-            .stats-row .col-lg-4 { margin-bottom: 0.75rem; }
-            .stats-row .col-md-6 { margin-bottom: 0.75rem; }
-        }
-        @media (max-width: 480px) { /* Çok küçük ekranlar */
-            .sidebar .nav-links .nav-item .nav-link, .sidebar .sidebar-footer .nav-link { font-size: 0.65rem; }
-            .sidebar .nav-links .nav-item .nav-link .link-text, .sidebar .sidebar-footer .nav-link .link-text { display: none; }
-            .stat-card h5 { font-size: 1.5rem; } .stat-card p { font-size: 0.8rem; }
-            .nav-tabs .nav-link { padding: 0.5rem 0.5rem; font-size: 0.8rem;}
+        .sidebar .nav-links .nav-item .nav-link.active {
+            background-color: var(--theme-sidebar-link-hover-bg); /* Arka plan rengi */
+            color: var(--theme-sidebar-link-hover-color); /* Metin rengi */
+            border-left-color: var(--theme-very-light-purple-bg); /* Sol kenarlık rengi (vurgu) */
         }
 
+        /* .sidebar .nav-links .nav-item .nav-link .link-text - Bağlantı içindeki metin (ikon yanındaki) */
+        .sidebar .nav-links .nav-item .nav-link .link-text {
+            margin-left: 0.5rem; /* Sol dış kenar boşluğu (ikon ile metin arası) */
+        }
 
-        .text-positive { color: #28a745 !important; /* Yeşil */ }
-        .text-negative { color: #dc3545 !important; /* Kırmızı */ }
+        /* .sidebar .sidebar-footer - Kenar çubuğu alt bölümü (örn: çıkış butonu) */
+        .sidebar .sidebar-footer {
+            padding: 0.8rem 1rem; /* İç kenar boşluğu */
+            border-top: 1px solid var(--theme-light-purple-accent); /* Üst kenarlık */
+            margin-top: auto; /* Kalan alanı yukarı iter, footer'ı en alta sabitler */
+        }
+
+        /* .sidebar .sidebar-footer .nav-link - Kenar çubuğu alt bölümündeki bağlantı */
+        .sidebar .sidebar-footer .nav-link {
+            color: var(--theme-sidebar-link-color); /* Metin rengi */
+            font-size: 0.95rem; /* Yazı tipi boyutu */
+            text-decoration: none; /* Metin altı çizgiyi kaldırır */
+            display:block; /* Blok element */
+        }
+        .sidebar .sidebar-footer .nav-link:hover {
+            color: var(--theme-sidebar-link-hover-color); /* Hover durumunda metin rengi */
+        }
+
+        /* .main-content-wrapper - Ana içerik sarmalayıcısı */
+        .main-content-wrapper {
+            flex-grow: 1; /* Kalan genişliği doldurur */
+            display: flex; /* Flexbox kullanımı */
+            flex-direction: column; /* İçeriği dikey sıralar (header, content, footer gibi) */
+            margin-left: var(--sidebar-width); /* Sol kenar çubuğu genişliği kadar soldan boşluk */
+            width: calc(100% - var(--sidebar-width)); /* Genişlik (tam genişlik - sidebar genişliği) */
+            min-height: 100vh; /* Minimum yükseklik (ekran yüksekliği kadar) */
+            transition: margin-left 0.3s ease, width 0.3s ease; /* Yumuşak geçiş efekti (sidebar açılıp kapandığında) */
+        }
+
+        /* .container-panel - Ana içerik alanı (kartlar, tablolar vb. burada yer alır) */
+        .container-panel {
+            flex-grow: 1; /* Kalan dikey alanı doldurur */
+            overflow-y: auto; /* İçerik sığmazsa dikey kaydırma çubuğu */
+            padding: 1.25rem; /* İç kenar boşlukları (üst, sağ, alt, sol) */
+        }
+
+        /* footer.app-footer - Sayfa alt bilgi (footer) bölümü */
+        footer.app-footer {
+            background-color: #f8f9fa; /* Arka plan rengi */
+            color: var(--theme-dark-gray); /* Metin rengi */
+            padding: 0.75rem 0; /* İç kenar boşluğu (dikeyde, yatayda 0) */
+            text-align: center; /* Metni ortalar */
+            font-size: 0.85rem; /* Yazı tipi boyutu */
+            border-top: 1px solid #e9ecef; /* Üst kenarlık */
+            flex-shrink: 0; /* Flexbox içinde küçülmesini engeller */
+        }
+
+        /* .stats-row - İstatistik kartlarının bulunduğu satır */
+        .stats-row {
+            margin-bottom: 1.5rem; /* Alt dış kenar boşluğu */
+        }
+
+        /* .stat-card - İstatistik kartı genel stili */
+        .stat-card {
+            background-color: var(--theme-primary-purple); /* Arka plan rengi */
+            color: var(--theme-text-light); /* Metin rengi */
+            border-radius: 8px; /* Köşe yuvarlaklığı */
+            padding: 1.25rem 1rem; /* İç kenar boşluğu */
+            text-align: center; /* Metni ortalar */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Hafif gölge efekti */
+            margin-bottom: 1rem; /* Alt dış kenar boşluğu (mobil görünümde alt alta geldiğinde) */
+        }
+
+        /* .stat-card h5 - İstatistik kartı içindeki başlık (rakam) */
+        .stat-card h5 {
+            font-size: 1.75rem; /* Yazı tipi boyutu */
+            font-weight: 700; /* Yazı tipi kalınlığı */
+            margin-bottom: 0.25rem; /* Alt dış kenar boşluğu */
+        }
+
+        /* .stat-card p - İstatistik kartı içindeki açıklama metni */
+        .stat-card p {
+            font-size: 0.9rem; /* Yazı tipi boyutu */
+            margin-bottom: 0; /* Alt dış kenar boşluğunu sıfırlar */
+            opacity: 0.9; /* Hafif şeffaflık */
+        }
+
+        /* .stat-card.gelir h5, .stat-card.bakiye-pozitif h5 - Gelir ve pozitif bakiye kartlarındaki rakam rengi */
+        .stat-card.gelir h5,
+        .stat-card.bakiye-pozitif h5 {
+            color: #a7f3d0; /* Açık yeşilimsi renk */
+        }
+
+        /* .stat-card.gider h5, .stat-card.bakiye-negatif h5 - Gider ve negatif bakiye kartlarındaki rakam rengi */
+        .stat-card.gider h5,
+        .stat-card.bakiye-negatif h5 {
+            color: #fca5a5; /* Açık kırmızımsı renk */
+        }
+
+        /* .text-positive - Pozitif durumlar için metin rengi (yeşil) */
+        .text-positive {
+            color: var(--text-green) !important; /* Yeşil renk (Bootstrap'i ezmek için !important) */
+            font-weight: bold; /* Kalın yazı tipi */
+        }
+
+        /* .text-negative - Negatif durumlar için metin rengi (kırmızı) */
+        .text-negative {
+            color: var(--text-red) !important; /* Kırmızı renk (Bootstrap'i ezmek için !important) */
+            font-weight: bold; /* Kalın yazı tipi */
+        }
+
+        /* .text-neutral - Nötr durumlar için metin rengi (siyah/koyu gri) */
+        .text-neutral {
+            color: var(--text-black) !important; /* Siyah/koyu gri renk */
+        }
+
+        /* .card - Genel kart stili (Bootstrap kartlarını özelleştirme) */
+        .card {
+            margin-bottom: 15px; /* Alt dış kenar boşluğu */
+            box-shadow: 0 1px 5px rgba(0,0,0,0.06); /* Hafif gölge */
+            border: 1px solid var(--theme-border-color); /* Kenarlık */
+            border-radius: 0.4rem; /* Köşe yuvarlaklığı */
+        }
+
+        /* .card-header - Kart başlık bölümü */
+        .card-header {
+            background-color: var(--theme-light-purple-accent); /* Arka plan rengi */
+            color: var(--theme-text-light); /* Metin rengi */
+            font-weight: 500; /* Yazı tipi kalınlığı */
+            padding: 0.5rem 0.75rem; /* İç kenar boşluğu */
+            border-bottom: 1px solid var(--theme-border-color); /* Alt kenarlık */
+            border-top-left-radius: calc(0.4rem - 1px); /* Sol üst köşe yuvarlaklığı (kenarlıkla uyumlu) */
+            border-top-right-radius: calc(0.4rem - 1px); /* Sağ üst köşe yuvarlaklığı (kenarlıkla uyumlu) */
+        }
+
+        /* .card-body - Kart içerik bölümü */
+        .card-body {
+            padding: 0.75rem; /* İç kenar boşluğu */
+        }
+
+        /* .card-title - Kart başlığı (tab içeriklerindeki) */
+        .card-title {
+            font-size: 1rem; /* Yazı tipi boyutu */
+            margin-bottom: 0.75rem; /* Alt dış kenar boşluğu */
+            color: var(--theme-text-dark); /* Metin rengi */
+            font-weight:500; /* Yazı tipi kalınlığı */
+        }
+
+        /* .nav-tabs - Sekme navigasyonu (Bootstrap özelleştirmesi) */
+        .nav-tabs {
+            border-bottom: 1px solid var(--theme-border-color); /* Alt kenarlık */
+            margin-bottom: 0; /* Alt dış kenar boşluğunu sıfırlar */
+        }
+
+        /* .nav-tabs .nav-link - Sekme bağlantısı */
+        .nav-tabs .nav-link {
+            color: var(--theme-primary-purple); /* Metin rengi */
+            border: 1px solid transparent; /* Kenarlık (aktif durumda değişir) */
+            border-top-left-radius: 0.25rem; /* Sol üst köşe yuvarlaklığı */
+            border-top-right-radius: 0.25rem; /* Sağ üst köşe yuvarlaklığı */
+            font-weight: 500; /* Yazı tipi kalınlığı */
+            padding: 0.6rem 1rem; /* İç kenar boşluğu */
+            font-size: 0.9rem; /* Yazı tipi boyutu */
+        }
+
+        /* .nav-tabs .nav-link.active - Aktif sekme bağlantısı */
+        .nav-tabs .nav-link.active {
+            color: var(--theme-dark-purple); /* Aktif metin rengi */
+            background-color: #fff; /* Aktif arka plan rengi (beyaz) */
+            border-color: var(--theme-border-color) var(--theme-border-color) #fff; /* Kenarlık renkleri (alt kenarlık görünmez) */
+        }
+
+        /* .tab-content > .tab-pane - Sekme içerik alanı */
+        .tab-content > .tab-pane {
+            background-color: #fff; /* Arka plan rengi (beyaz) */
+            border: 1px solid var(--theme-border-color); /* Kenarlık */
+            border-top: none; /* Üst kenarlığı kaldırır (nav-tabs ile birleşik görünüm) */
+            padding: 1rem; /* İç kenar boşluğu */
+            border-bottom-left-radius: 0.25rem; /* Sol alt köşe yuvarlaklığı */
+            border-bottom-right-radius: 0.25rem; /* Sağ alt köşe yuvarlaklığı */
+        }
+
+        /* .table-responsive - Duyarlı tablo sarmalayıcısı */
+        .table-responsive {
+            max-height: calc(100vh - 380px); /* Maksimum yükseklik (ekran yüksekliğinden diğer elemanların yüksekliği çıkarılarak hesaplanır) */
+            min-height: 200px; /* Minimum yükseklik */
+            overflow-y: auto; /* İçerik sığmazsa dikey kaydırma çubuğu */
+        }
+
+        /* .sticky-header th - Tablo başlıklarının yapışkan (sticky) olması için */
+        .sticky-header th {
+            position: sticky; /* Yapışkan konumlandırma */
+            top: -1px; /* Kaydırma sırasında tam en üste yapışması için (kenarlık vb. durumları için -1px) */
+            background: #f8f9fa; /* Arka plan rengi (içerik altından geçerken görünmemesi için) */
+            z-index: 10; /* Diğer tablo içeriğinin üzerinde kalması için */
+            box-shadow: inset 0 -2px 0 #dee2e6; /* Alt gölge (çizgi gibi görünür) */
+            font-size: 0.85rem; /* Yazı tipi boyutu */
+        }
+
+        /* .table td, .table th - Tablo hücreleri ve başlıkları için genel stil */
+        .table td, .table th {
+            padding: 0.5rem; /* İç kenar boşluğu */
+            font-size: 0.85rem; /* Yazı tipi boyutu */
+            vertical-align: middle; /* Dikeyde ortalama */
+        }
+
+        /* .btn-custom-purple - Özel mor buton stili */
+        .btn-custom-purple {
+            background-color: var(--theme-primary-purple); /* Arka plan rengi */
+            color: white; /* Metin rengi */
+            border: none; /* Kenarlık yok */
+            padding: 0.4rem 0.8rem; /* İç kenar boşluğu */
+            font-weight: 500; /* Yazı tipi kalınlığı */
+            font-size: 0.9rem; /* Yazı tipi boyutu */
+        }
+        .btn-custom-purple:hover {
+            background-color: var(--theme-dark-purple); /* Hover durumunda arka plan rengi */
+            color: white; /* Hover durumunda metin rengi */
+        }
+
+        /* .form-label - Form etiketleri için stil */
+        .form-label {
+            font-weight: 500; /* Yazı tipi kalınlığı */
+            color: var(--theme-text-dark); /* Metin rengi */
+            font-size: 0.85rem; /* Yazı tipi boyutu */
+            margin-bottom: 0.2rem; /* Alt dış kenar boşluğu */
+        }
+
+        /* .form-control-sm, .form-select-sm - Küçük form elemanları için boyut ve yazı tipi ayarı */
+        .form-control-sm, .form-select-sm {
+            font-size: 0.85rem !important; /* Yazı tipi boyutu (!important gerekebilir Bootstrap'i ezmek için) */
+            padding: 0.3rem 0.6rem !important; /* İç kenar boşluğu (!important gerekebilir) */
+        }
+        /* select.form-select-sm - Küçük select (dropdown) elemanları için özel padding (sağdaki ok için) */
+        select.form-select-sm {
+            padding-right: 1.5rem; /* Sağ iç kenar boşluğu */
+        }
+
+        /* .btn-sm - Küçük butonlar için boyut ayarı */
+        .btn-sm {
+            padding: .2rem .4rem; /* İç kenar boşluğu */
+            font-size: .75rem; /* Yazı tipi boyutu */
+        }
+
+
+        /* @media (max-width: 991.98px) - Mobil ve Tablet görünümleri için CSS kuralları (Bootstrap lg breakpoint'i) */
+        @media (max-width: 991.98px) {
+            /* body - Mobil için body ayarları */
+            body {
+                display: block; /* Flexbox'ı devre dışı bırakır, normal blok akışına döner */
+                padding-bottom: var(--mobile-bottom-bar-height); /* Alttaki mobil navigasyon barı için boşluk */
+            }
+            /* .sidebar - Mobil için kenar çubuğu (alt navigasyon barına dönüşür) */
+            .sidebar {
+                width: 100%; /* Tam genişlik */
+                height: var(--mobile-bottom-bar-height); /* Sabit yükseklik */
+                min-height: var(--mobile-bottom-bar-height); /* Minimum yükseklik */
+                position: fixed; /* Sabit konumlandırma */
+                bottom: 0; /* Alta sabitlenir */
+                left: 0; /* Sola sabitlenir */
+                top: auto; /* Üstten sabitlemeyi kaldırır */
+                flex-direction: row; /* İç elementleri yatayda sıralar */
+                justify-content: space-around; /* İç elementleri aralıklı dağıtır */
+                align-items: center; /* İç elementleri dikeyde ortalar */
+                padding: 0 0.5rem; /* Yatay iç kenar boşluğu */
+                border-top: 1px solid var(--theme-light-purple-accent); /* Üst kenarlık */
+                box-shadow: 0 -2px 5px rgba(0,0,0,0.1); /* Üst gölge */
+            }
+            /* Mobil görünümde sidebar başlığı ve kullanıcı bilgisi gizlenir */
+            .sidebar .sidebar-header, .sidebar .user-info-wrapper {
+                display: none;
+            }
+            /* .sidebar .nav-links - Mobil navigasyon bağlantıları */
+            .sidebar .nav-links {
+                display: flex; /* Flexbox kullanımı */
+                flex-direction: row; /* Yatay sıralama */
+                justify-content: space-around; /* Aralıklı dağıtım */
+                align-items: center; /* Dikeyde ortalama */
+                width: 100%; /* Tam genişlik */
+                height: 100%; /* Tam yükseklik */
+            }
+            /* .sidebar .nav-links .nav-item - Mobil navigasyon öğesi */
+            .sidebar .nav-links .nav-item {
+                margin-bottom: 0; /* Alt dış kenar boşluğunu sıfırlar */
+                flex-grow: 1; /* Kalan alanı eşit paylaşır */
+                text-align: center; /* Metni ortalar */
+                height: 100%; /* Tam yükseklik */
+            }
+            /* .sidebar .nav-links .nav-item .nav-link - Mobil navigasyon bağlantısı */
+            .sidebar .nav-links .nav-item .nav-link {
+                padding: 0.5rem; /* İç kenar boşluğu */
+                font-size: 0.75rem; /* Yazı tipi boyutu */
+                white-space: nowrap; /* Metinlerin alt satıra kaymasını engeller */
+                display: flex; /* Flexbox kullanımı */
+                flex-direction: column; /* İkon ve metni dikey sıralar */
+                align-items: center; /* Yatayda ortalar */
+                justify-content: center; /* Dikeyde ortalar */
+                height: 100%; /* Tam yükseklik */
+                border-left: none; /* Sol kenarlığı kaldırır */
+                border-bottom: 3px solid transparent; /* Alt kenarlık (aktif durum için) */
+            }
+            /* Mobil navigasyon bağlantısı hover ve aktif durum stilleri */
+            .sidebar .nav-links .nav-item .nav-link:hover,
+            .sidebar .nav-links .nav-item .nav-link.active {
+                background-color: transparent; /* Arka planı şeffaf yapar */
+                color: var(--theme-sidebar-link-hover-color); /* Metin rengi */
+                border-left-color: transparent; /* Sol kenarlığı şeffaf yapar */
+                border-bottom-color: var(--theme-very-light-purple-bg); /* Alt kenarlık rengi (vurgu) */
+            }
+            /* .sidebar .nav-links .nav-item .nav-link .link-text - Mobil bağlantı metni */
+            .sidebar .nav-links .nav-item .nav-link .link-text {
+                margin-left: 0; /* Sol dış kenar boşluğunu sıfırlar */
+                margin-top: 2px; /* Üst dış kenar boşluğu (ikon ile metin arası) */
+            }
+            /* .sidebar .sidebar-footer - Mobil kenar çubuğu alt bölümü (örn: çıkış) */
+            .sidebar .sidebar-footer {
+                border-top: none; /* Üst kenarlığı kaldırır */
+                padding: 0; /* İç kenar boşluğunu sıfırlar */
+                height: 100%; /* Tam yükseklik */
+                display: flex; /* Flexbox kullanımı */
+                align-items: center; /* Dikeyde ortalar */
+                flex-grow: 1; /* Alanı paylaşır */
+                max-width: 25%; /* Maksimum genişlik (diğer itemlerle orantılı) */
+                margin-top:0; /* Üst dış kenar boşluğunu sıfırlar */
+            }
+            /* .sidebar .sidebar-footer .nav-link - Mobil çıkış bağlantısı */
+            .sidebar .sidebar-footer .nav-link {
+                padding: 0.5rem; /* İç kenar boşluğu */
+                font-size: 0.75rem; /* Yazı tipi boyutu */
+                white-space: nowrap; /* Metinlerin alt satıra kaymasını engeller */
+                display: flex; /* Flexbox kullanımı */
+                flex-direction: column; /* İkon ve metni dikey sıralar */
+                align-items: center; /* Yatayda ortalar */
+                justify-content: center; /* Dikeyde ortalar */
+                width: 100%; /* Tam genişlik */
+                height: 100%; /* Tam yükseklik */
+            }
+            /* .main-content-wrapper - Mobil ana içerik sarmalayıcısı */
+            .main-content-wrapper {
+                margin-left: 0; /* Sol dış kenar boşluğunu sıfırlar (sidebar artık altta) */
+                width: 100%; /* Tam genişlik */
+            }
+            /* .container-panel - Mobil ana içerik alanı */
+            .container-panel {
+                padding: 0.75rem; /* İç kenar boşluğunu azaltır */
+            }
+            /* .table-responsive - Mobil duyarlı tablo sarmalayıcısı */
+            .table-responsive {
+                max-height: calc(100vh - 320px); /* Mobil için maksimum yüksekliği ayarlar */
+            }
+            /* Mobil istatistik kartları için alt boşluk düzenlemesi */
+            .stats-row .col-lg-4 { /* Normalde col-lg-4 olanlar mobilde alt alta gelir */
+                margin-bottom: 0.75rem;
+            }
+            .stats-row .col-md-6 { /* Normalde col-md-6 olanlar mobilde alt alta gelir */
+                margin-bottom: 0.75rem;
+            }
+        }
+
+        /* @media (max-width: 480px) - Çok küçük ekranlar için CSS kuralları (Bootstrap sm breakpoint'inden küçük) */
+        @media (max-width: 480px) {
+            /* Mobil navigasyon bağlantı yazı tipi boyutu */
+            .sidebar .nav-links .nav-item .nav-link,
+            .sidebar .sidebar-footer .nav-link {
+                font-size: 0.65rem;
+            }
+            /* Çok küçük ekranlarda ikon yanındaki metinleri gizler */
+            .sidebar .nav-links .nav-item .nav-link .link-text,
+            .sidebar .sidebar-footer .nav-link .link-text {
+                display: none;
+            }
+            /* İstatistik kartı rakam ve açıklama yazı tipi boyutu */
+            .stat-card h5 { font-size: 1.5rem; }
+            .stat-card p { font-size: 0.8rem; }
+            /* Sekme bağlantıları için padding ve yazı tipi boyutu */
+            .nav-tabs .nav-link {
+                padding: 0.5rem 0.5rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* .text-positive ve .text-negative zaten yukarıda tanımlanmıştı, tekrarına gerek yok. */
+        /* Yorum: Bu bloklar zaten :root içinde tanımlanan değişkenleri kullanıyor veya yukarıda benzerleri var. */
+        /*
+        .text-positive { color: #28a745 !important; }
+        .text-negative { color: #dc3545 !important; }
+        */
+
+
+        /* İstatistik kartları satırının (Toplam Tahsil Edilen Aidat vb.)
+           scroll edilebilir ana içerik alanının en üstüne yapışık kalması için */
+        .stats-row {
+            position: -webkit-sticky; /* Safari tarayıcıları için destek */
+            position: sticky; /* Yapışkan konumlandırma */
+            top: 0; /* İçinde bulunduğu .container-panel'in içerik alanının üstüne yapışır */
+            z-index: 100; /* Diğer içeriklerin üzerinde kalması için yığınlama sırası */
+            background-color: var(--theme-very-light-purple-bg); /* Arka plan rengi (kaydırma sırasında altındaki içeriğin görünmemesi için) */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Yapışkan olduğunda görsel ayrım için hafif gölge */
+            /* margin-bottom: 1.5rem; Bu stil zaten yukarıda .stats-row için tanımlı */
+        }
+
+        /* Alt bilgi (footer) alanının sayfanın en altına yapışık kalması için */
+        footer.app-footer {
+            position: -webkit-sticky; /* Safari tarayıcıları için destek */
+            position: sticky; /* Yapışkan konumlandırma */
+            bottom: 0; /* Görüntü alanının (viewport) en altına yapışır */
+            z-index: 1020; /* Diğer elementlerin (modal, sidebar hariç) üzerinde kalması için */
+            /* Diğer stiller (background-color, padding vb.) yukarıda zaten tanımlı */
+        }
    
     </style>
 </head>
@@ -133,7 +579,10 @@
         </div>
     </aside>
 
+
+
     <div class="main-content-wrapper">
+    <div class="main"></div>
         <div class="container-fluid container-panel">
             {% if messages %}
                 {% for message in messages %}
@@ -144,7 +593,7 @@
             {% endif %}
 
             {% if request.user.is_yonetici %}
-            <div class="row stats-row">
+            <div class="row stats-row"> 
                 <div class="col-lg-4 col-md-6 mb-3 mb-lg-0">
                     <div class="stat-card gelir">
                         <h5>{{ toplam_gelir_aidatlar|floatformat:0|intcomma }} ₺</h5>
@@ -157,8 +606,7 @@
                         <p>Toplam Site Gideri</p>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-12">
-                    <div class="stat-card {% if kasa_bakiyesi >= 0 %}bakiye-pozitif{% else %}bakiye-negatif{% endif %}">
+                <div class="col-lg-4 col-md-12"> <div class="stat-card {% if kasa_bakiyesi >= 0 %}bakiye-pozitif{% else %}bakiye-negatif{% endif %}">
                         <h5>{{ kasa_bakiyesi|floatformat:0|intcomma }} ₺</h5>
                         <p>Kasa Durumu</p>
                     </div>
@@ -166,10 +614,7 @@
             </div>
             {% endif %}
 
-            <div class="row g-3">
-                <div class="col-lg-{% if aidat_ekleme_goster or request.user.is_yonetici %}8{% else %}12{% endif %}">
-                    <ul class="nav nav-tabs" id="panelTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
+            <div class="row g-3"> <div class="col-lg-{% if aidat_ekleme_goster or request.user.is_yonetici %}8{% else %}12{% endif %}"> <ul class="nav nav-tabs" id="panelTabs" role="tablist"> <li class="nav-item" role="presentation">
                             <button class="nav-link active" id="aidat-listesi-ozet-tab" data-bs-toggle="tab" data-bs-target="#aidatListesiOzetPane" type="button" role="tab" aria-controls="aidatListesiOzetPane" aria-selected="true">Aidat Listesi (Özet)</button>
                         </li>
                         {% if request.user.is_yonetici %}
@@ -181,14 +626,10 @@
                         </li>
                         {% endif %}
                     </ul>
-                    <div class="tab-content" id="panelTabsContent">
-                        <div class="tab-pane fade show active" id="aidatListesiOzetPane" role="tabpanel" aria-labelledby="aidat-listesi-ozet-tab" tabindex="0">
+                    <div class="tab-content" id="panelTabsContent"> <div class="tab-pane fade show active" id="aidatListesiOzetPane" role="tabpanel" aria-labelledby="aidat-listesi-ozet-tab" tabindex="0">
                             <h5 class="card-title">Aidat Takip Listesi ({{ current_year }})</h5>
                             {% if aidat_listesi_ozet %}
-                            <div class="table-responsive">
-                                <table class="table table-striped table-hover table-sm">
-                                    <thead class="sticky-header">
-                                        <tr>
+                            <div class="table-responsive"> <table class="table table-striped table-hover table-sm"> <thead class="sticky-header"> <tr>
                                             <th>B-D</th><th>Sakin</th>
                                             <th class="text-end text-negative">Yıllık Borç</th>
                                             <th class="text-end">Ödenen</th>
@@ -197,8 +638,7 @@
                                     </thead>
                                     <tbody>
                                     {% for ozet in aidat_listesi_ozet %}
-                                        <tr {% if ozet.is_current_user_flat %}class="table-info fw-bold"{% endif %}>
-                                            <td>{{ ozet.blok_daire }}</td><td>{{ ozet.sakin }}</td>
+                                        <tr {% if ozet.is_current_user_flat %}class="table-info fw-bold"{% endif %}> <td>{{ ozet.blok_daire }}</td><td>{{ ozet.sakin }}</td>
                                             <td class="text-end text-negative">{{ ozet.yillik_borc|floatformat:0|intcomma }} ₺</td>
                                             <td class="text-end {% if ozet.odenen > 0 %}text-positive{% else %}text-neutral{% endif %}">{{ ozet.odenen|floatformat:0|intcomma }} ₺</td>
                                             <td class="text-end {% if ozet.bakiye >= 0 %}text-positive{% else %}text-negative{% endif %}">
@@ -213,8 +653,7 @@
                             {% else %}<p class="text-center mt-3">Sitede aidat takibi için daire bulunmamaktadır.</p>{% endif %}
                         </div>
 
-                        {% if request.user.is_yonetici %}
-                        <div class="tab-pane fade" id="siteGiderListesiPane" role="tabpanel" aria-labelledby="site-gider-listesi-tab" tabindex="0">
+                        {% if request.user.is_yonetici %} <div class="tab-pane fade" id="siteGiderListesiPane" role="tabpanel" aria-labelledby="site-gider-listesi-tab" tabindex="0">
                             <h5 class="card-title">Site Giderleri (Son 50)</h5>
                             {% if site_gider_listesi %}
                             <div class="table-responsive">
@@ -231,8 +670,7 @@
                                             <td class="text-end text-negative">{{ gider.tutar|floatformat:0|intcomma }} ₺</td>
                                             <td>{{ gider.aciklama|truncatewords:4|default:"-" }}</td>
                                             <td>{% if gider.makbuz %}<a href="{{ gider.makbuz.url }}" target="_blank" class="btn btn-sm btn-outline-secondary py-0 px-1" style="font-size:0.75rem;">Gör</a>{% else %}-{% endif %}</td>
-                                            <td>
-                                                <a href="{% url 'yonetim:gider_update' gider.id %}" class="btn btn-sm btn-outline-warning py-0 px-1" style="font-size:0.75rem;"><i class="fas fa-edit"></i></a>
+                                            <td> <a href="{% url 'yonetim:gider_update' gider.id %}" class="btn btn-sm btn-outline-warning py-0 px-1" style="font-size:0.75rem;"><i class="fas fa-edit"></i></a>
                                                 <a href="{% url 'yonetim:gider_delete' gider.id %}" class="btn btn-sm btn-outline-danger py-0 px-1" style="font-size:0.75rem;"><i class="fas fa-trash-alt"></i></a>
                                             </td>
                                         </tr>
@@ -261,8 +699,7 @@
                                             <td class="text-end text-positive">{{ aidat_kaydi.tutar|floatformat:0|intcomma }} ₺</td>
                                             <td>{{ aidat_kaydi.aciklama|truncatewords:4|default:"-" }}</td>
                                             <td>{% if aidat_kaydi.makbuz %}<a href="{{ aidat_kaydi.makbuz.url }}" target="_blank" class="btn btn-sm btn-outline-secondary py-0 px-1" style="font-size:0.75rem;">Gör</a>{% else %}-{% endif %}</td>
-                                            <td>
-                                                <a href="{% url 'yonetim:aidat_update' aidat_kaydi.id %}?from_panel=true" class="btn btn-sm btn-outline-warning py-0 px-1" style="font-size:0.75rem;"><i class="fas fa-edit"></i></a>
+                                            <td><a href="{% url 'yonetim:aidat_update' aidat_kaydi.id %}?from_panel=true" class="btn btn-sm btn-outline-warning py-0 px-1" style="font-size:0.75rem;"><i class="fas fa-edit"></i></a>
                                                 <a href="{% url 'yonetim:aidat_delete' aidat_kaydi.id %}?from_panel=true" class="btn btn-sm btn-outline-danger py-0 px-1" style="font-size:0.75rem;"><i class="fas fa-trash-alt"></i></a>
                                             </td>
                                         </tr>
@@ -272,78 +709,79 @@
                             </div>
                             {% else %}<p class="text-center mt-3">Kayıtlı aidat bulunmamaktadır.</p>{% endif %}
                         </div>
-                        {% endif %}
-                    </div>
+                        {% endif %} </div>
                 </div>
 
-                {% if aidat_ekleme_goster or request.user.is_yonetici %}
-                <div class="col-lg-4">
-                    {% if aidat_ekleme_goster %}
-                    <div class="card mb-3">
+                {% if aidat_ekleme_goster or request.user.is_yonetici %} <div class="col-lg-4">
+                    {% if aidat_ekleme_goster %} <div class="card mb-3">
                         <div class="card-header">Aidat İşle ({{ kullanici_kendi_dairesi.daire_tam_adi }})</div>
                         <div class="card-body">
-                            <form method="post" enctype="multipart/form-data">
-                                {% csrf_token %}
-                                <input type="hidden" name="aidat_ekle" value="1">
-                                {% for field in aidat_ekle_form %}
-                                    <div class="mb-2">
+                            <form method="post" enctype="multipart/form-data"> {% csrf_token %}
+                                <input type="hidden" name="aidat_ekle" value="1"> {% for field in aidat_ekle_form %} <div class="mb-2">
                                         <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                        {{ field }}
-                                        {% if field.help_text %}<small class="form-text text-muted">{{ field.help_text }}</small>{% endif %}
-                                        {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
-                                    </div>
+                                        {{ field }} {% if field.help_text %}<small class="form-text text-muted">{{ field.help_text }}</small>{% endif %} {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %} </div>
                                 {% endfor %}
                                 <button type="submit" class="btn btn-custom-purple w-100 mt-2">Aidatı Kaydet</button>
                             </form>
                         </div>
                     </div>
                     {% endif %}
-                    {% if request.user.is_yonetici %}
-                    <div class="card">
+                    {% if request.user.is_yonetici %} <div class="card">
                         <div class="card-header">Gider İşle</div>
                         <div class="card-body">
-                             <form method="post" enctype="multipart/form-data">
-                                {% csrf_token %}
-                                <input type="hidden" name="gider_ekle" value="1">
-                                {% for field in gider_ekle_form %}
-                                     <div class="mb-2">
+                             <form method="post" enctype="multipart/form-data"> {% csrf_token %}
+                                <input type="hidden" name="gider_ekle" value="1"> {% for field in gider_ekle_form %} <div class="mb-2">
                                         <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                        {{ field }}
-                                        {% if field.help_text %}<small class="form-text text-muted">{{ field.help_text }}</small>{% endif %}
-                                        {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
-                                    </div>
+                                        {{ field }} {% if field.help_text %}<small class="form-text text-muted">{{ field.help_text }}</small>{% endif %} {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %} </div>
                                 {% endfor %}
                                 <button type="submit" class="btn btn-custom-purple w-100 mt-2">Gideri Kaydet</button>
                             </form>
                         </div>
                     </div>
-                    {% endif %}
-                </div>
-                {% endif %}
-            </div>
+                    {% endif %} </div>
+                {% endif %} </div>
         </div>
-        <footer class="app-footer">
-            <small>&copy; {% now "Y" %} {{ site.ad|default:"Site Yönetim Sistemi" }}. Tüm hakları saklıdır.</small>
-        </footer>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+        </div>
+        
+
+
+   
+
+
+
+
+
+
+
+
+
+    </div> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    
+    
+    
     <script>
+        // Sayfa tamamen yüklendiğinde çalışacak JavaScript kodları
         document.addEventListener('DOMContentLoaded', function () {
-            // Sayfa yüklendiğinde URL'deki hash'e göre ilgili sekmeyi aktif et
+            // URL'deki # (hash) değerine göre ilgili sekmeyi aktif et
             var hash = window.location.hash;
             if (hash) {
                 var tabToActivate = document.querySelector('.nav-tabs button[data-bs-target="' + hash + '"]');
                 if (tabToActivate) {
-                    var tab = new bootstrap.Tab(tabToActivate);
-                    tab.show();
+                    var tab = new bootstrap.Tab(tabToActivate); // Bootstrap sekme objesi oluştur
+                    tab.show(); // Sekmeyi göster
                 }
             }
 
-            // Sekme değiştiğinde URL'deki hash'i güncelle (isteğe bağlı)
+            // Sekmelerden biri gösterildiğinde URL'deki # (hash) değerini güncelle (isteğe bağlı)
+            // Bu, sayfa yenilendiğinde veya link paylaşıldığında doğru sekmenin açılmasına yardımcı olur
             var tabElms = document.querySelectorAll('button[data-bs-toggle="tab"]');
             tabElms.forEach(function (tabElm) {
                 tabElm.addEventListener('shown.bs.tab', function (event) {
-                    history.replaceState(null, null, event.target.dataset.bsTarget);
+                    // event.target seçilen yeni sekme butonudur
+                    // event.relatedTarget önceden seçili olan sekme butonudur
+                    history.replaceState(null, null, event.target.dataset.bsTarget); // Tarayıcı geçmişini değiştirmeden URL'yi güncelle
                 });
             });
         });
